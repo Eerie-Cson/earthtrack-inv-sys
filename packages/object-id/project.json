@@ -1,0 +1,9 @@
+{
+  "name": "object-id",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/object-id/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project object-id --web",
+  "targets": {}
+}
