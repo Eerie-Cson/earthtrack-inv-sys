@@ -1,4 +1,4 @@
-import ObjectId from './object-id';
+import { ObjectId } from './object-id';
 import { ObjectType } from './object-type';
 import * as R from 'ramda';
 
