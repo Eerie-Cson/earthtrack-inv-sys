@@ -70,4 +70,73 @@ describe('MongooseRepository', () => {
       await teardown();
     });
   });
+
+  describe('#find', () => {
+    test.concurrent('find item', async () => {
+      const { repository, teardown } = await setupFixture();
+
+      const product = generateProduct();
+
+      await repository.create(product);
+
+      await expect(repository.find(product.id)).resolves.toEqual(product);
+
+      await teardown();
+    });
+  });
+
+  describe('#list', () => {
+    test.concurrent('list items', async () => {
+      const { repository, teardown } = await setupFixture();
+
+      const product1 = generateProduct();
+      const product2 = generateProduct();
+
+      await Promise.all([
+        repository.create(product1),
+        repository.create(product2),
+      ]);
+
+      await expect(repository.list()).resolves.toEqual([product1, product2]);
+
+      await teardown();
+    });
+  });
+
+  describe('#update', () => {
+    test.concurrent('update item', async () => {
+      const { repository, teardown } = await setupFixture();
+
+      const product = generateProduct();
+
+      await repository.create(product);
+
+      await expect(
+        repository.update(product.id, { name: 'new name' })
+      ).resolves.toBeUndefined();
+
+      await expect(repository.find(product.id)).resolves.toEqual({
+        ...product,
+        name: 'new name',
+      });
+
+      await teardown();
+    });
+  });
+
+  describe('#delete', () => {
+    test.concurrent('delete item', async () => {
+      const { repository, teardown } = await setupFixture();
+
+      const product = generateProduct();
+
+      await repository.create(product);
+
+      await expect(repository.delete(product.id)).resolves.toBeUndefined();
+
+      await expect(repository.find(product.id)).resolves.toBeNull();
+
+      await teardown();
+    });
+  });
 });
