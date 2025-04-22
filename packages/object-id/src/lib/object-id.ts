@@ -7,7 +7,7 @@ const Prefix: Partial<{ [key in ObjectType]: string }> = {
   [ObjectType.PRODUCT]: 'pro',
 };
 
-export default class ObjectId {
+export class ObjectId {
   private readonly value: string | Buffer;
 
   constructor(value?: Buffer) {
