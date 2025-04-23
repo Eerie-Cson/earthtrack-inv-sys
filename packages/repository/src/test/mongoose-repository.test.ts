@@ -1,7 +1,8 @@
+import { faker } from '@faker-js/faker';
 import { ObjectId, ObjectType } from '@lib/object-id';
 import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import mongoose, { Schema } from 'mongoose';
-import { faker } from '@faker-js/faker';
+import * as R from 'ramda';
 import { MongooseRepository } from '../lib/mongoose-repository';
 
 type Product = {
@@ -35,6 +36,7 @@ export async function setupFixture() {
       description: String,
       category: String,
       price: Number,
+      cursor: String,
     })
   );
 
@@ -46,6 +48,15 @@ export async function setupFixture() {
     },
   };
 }
+function generateCursor(date?: number) {
+  const buffer = Buffer.alloc(8);
+
+  const timestamp = BigInt(date || Date.now());
+
+  buffer.writeBigUInt64BE(timestamp);
+
+  return buffer.toString('base64');
+}
 
 function generateProduct() {
   const id = ObjectId.generate(ObjectType.PRODUCT);
@@ -55,6 +66,7 @@ function generateProduct() {
     description: faker.commerce.productDescription(),
     category: faker.commerce.department(),
     price: Number(faker.commerce.price()),
+    cursor: generateCursor(),
   };
 }
 
@@ -135,6 +147,56 @@ describe('MongooseRepository', () => {
       await expect(repository.delete(product.id)).resolves.toBeUndefined();
 
       await expect(repository.find(product.id)).resolves.toBeNull();
+
+      await teardown();
+    });
+  });
+
+  describe('#paginateList', () => {
+    test.concurrent('paginate items', async () => {
+      const { repository, teardown } = await setupFixture();
+      const now = Date.now();
+      const product1 = {
+        ...generateProduct(),
+        cursor: generateCursor(now),
+      };
+      const product2 = {
+        ...generateProduct(),
+        cursor: generateCursor(now + 1),
+      };
+      const product3 = {
+        ...generateProduct(),
+        cursor: generateCursor(now + 2),
+      };
+
+      await Promise.all([
+        repository.create(product1),
+        repository.create(product2),
+        repository.create(product3),
+      ]);
+
+      const resultPage1 = await repository.paginateList(
+        {},
+        {
+          limit: 2,
+          sort: 'asc',
+        }
+      );
+
+      expect(resultPage1.data).toEqual([product1, product2]);
+      expect(resultPage1.nextCursor).toEqual(product2.cursor);
+
+      const resultPage2 = await repository.paginateList(
+        {},
+        {
+          cursor: resultPage1.nextCursor,
+          limit: 2,
+          sort: 'asc',
+        }
+      );
+
+      expect(resultPage2.data).toEqual([product3]);
+      expect(resultPage2.nextCursor).toBeUndefined();
 
       await teardown();
     });
