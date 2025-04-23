@@ -1,12 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { PaginatedResponse, paginate } from '@lib/paginate';
-import { ProductRepository } from './repository/product.repository';
-import { Product } from '@lib/types';
-import { Tokens } from './libs/tokens';
 import { ObjectId } from '@lib/object-id';
-import { FilterQuery } from 'mongoose';
+import { PaginateOptions } from '@lib/paginate';
+import { Category, Product } from '@lib/types';
 import { normalizeDocument } from '@lib/util';
-import { ProductError, ProductNotFoundError } from '../error';
+import { Inject, Injectable } from '@nestjs/common';
+import { FilterQuery } from 'mongoose';
+import { ProductNotFoundError } from '../error';
+import { Tokens } from './libs/tokens';
+import { ProductRepository } from './repository/product.repository';
 
 @Injectable()
 export class ProductService {
@@ -45,9 +45,36 @@ export class ProductService {
     return normalizeDocument(product);
   }
 
-  async listProducts(params: FilterQuery<Product>) {
-    const products = await this.productRepository.list(params);
+  async listProducts(params: {
+    limit: number;
+    rawCursor?: string;
+    sort: 'asc' | 'desc';
+    category?: Category;
+    priceMin?: number;
+    priceMax?: number;
+  }) {
+    const filter: FilterQuery<Product> = {};
 
-    return products.map((product) => normalizeDocument(product));
+    if (params.category) filter.category = params.category;
+    if (params.priceMin || params.priceMax) {
+      filter.price = {};
+      if (params.priceMin) filter.price.$gte = params.priceMin;
+      if (params.priceMax) filter.price.$lte = params.priceMax;
+    }
+
+    const options: PaginateOptions<Partial<Product>> = {
+      limit: params.limit,
+      sort: params.sort,
+      cursor: params.rawCursor
+        ? Buffer.from(params.rawCursor, 'base64')
+        : undefined,
+    };
+
+    const result = await this.productRepository.paginateList(filter, options);
+
+    return {
+      data: result.data.map(normalizeDocument),
+      nextCursor: result.nextCursor?.toString('base64') || null,
+    };
   }
 }
