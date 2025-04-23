@@ -1,16 +1,18 @@
 import {
+  Body,
   Controller,
+  Delete,
+  Get,
+  Param,
   Post,
   Put,
-  Delete,
-  Body,
-  Param,
-  Get,
+  Query,
 } from '@nestjs/common';
-import { ProductService } from './product.service';
 import { CreateProductDto, UpdateProductDto } from './dto';
+import { ProductService } from './product.service';
 
 import { ObjectId, ObjectType } from '@lib/object-id';
+import { ProductListQueryDto } from './dto/product-list-query.dto';
 
 @Controller('products')
 export class ProductController {
@@ -44,7 +46,14 @@ export class ProductController {
   }
 
   @Get()
-  async listProducts() {
-    return this.productService.listProducts({});
+  async getPaginatedProducts(@Query() params: ProductListQueryDto) {
+    return this.productService.listProducts({
+      limit: params.limit,
+      rawCursor: params.cursor,
+      sort: params.sort,
+      category: params.category,
+      priceMin: params.priceMin,
+      priceMax: params.priceMax,
+    });
   }
 }
