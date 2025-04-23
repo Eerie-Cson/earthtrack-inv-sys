@@ -5,6 +5,7 @@ import { Product } from '@lib/types';
 import { Tokens } from './libs/tokens';
 import { ObjectId } from '@lib/object-id';
 import { FilterQuery } from 'mongoose';
+import { normalizeDocument } from '@lib/util';
 
 @Injectable()
 export class ProductService {
@@ -28,18 +29,12 @@ export class ProductService {
   async findProduct(params: FilterQuery<Product>) {
     const product = await this.productRepository.find(params);
 
-    return {
-      ...product,
-      id: product.id.toString(),
-    };
+    return normalizeDocument(product);
   }
 
   async listProducts(params: FilterQuery<Product>) {
     const products = await this.productRepository.list(params);
 
-    return products.map((product) => ({
-      ...product,
-      id: product.id.toString(),
-    }));
+    return products.map((product) => normalizeDocument(product));
   }
 }

@@ -16,7 +16,7 @@ export function ProductRepositoryFactory(connection: Connection) {
     },
     description: String,
     price: {
-      type: String,
+      type: Number,
       required: true,
     },
     category: {
