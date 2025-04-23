@@ -33,7 +33,5 @@ export function ProductRepositoryFactory(connection: Connection) {
     },
   });
 
-  schema.index({ id: 1 }, { unique: true });
-
   return new MongooseRepository<Product>(connection, 'Product', schema);
 }
