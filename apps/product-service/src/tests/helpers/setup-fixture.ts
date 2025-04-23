@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { getRandomPort } from 'get-port-please';
 import { MongoMemoryReplSet } from 'mongodb-memory-server';
-import { ProductModule } from '../app/product.module';
+import { ProductModule } from '../../app/product.module';
 import { ConfigService } from '@nestjs/config';
 import supertest from 'supertest';
 import { ValidationPipe } from '@nestjs/common';
