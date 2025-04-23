@@ -22,22 +22,25 @@ export class ProductController {
       id: ObjectId.generate(ObjectType.PRODUCT),
       ...dto,
     });
-    return { success: true };
+    return { data: { createProduct: true } };
   }
 
   @Put(':id')
   async updateProduct(@Param('id') id: string, @Body() dto: UpdateProductDto) {
-    return this.productService.updateProduct(ObjectId.from(id), dto);
+    await this.productService.updateProduct(ObjectId.from(id), dto);
+    return { data: { updateProduct: true } };
   }
 
   @Delete(':id')
   async deleteProduct(@Param('id') id: string) {
-    return this.productService.deleteProduct(ObjectId.from(id));
+    await this.productService.deleteProduct(ObjectId.from(id));
+    return { data: { deleteProduct: true } };
   }
 
   @Get(':id')
   async getProductById(@Param('id') id: string) {
-    return this.productService.findProduct(ObjectId.from(id));
+    const product = await this.productService.findProduct(ObjectId.from(id));
+    return { data: product };
   }
 
   @Get()
