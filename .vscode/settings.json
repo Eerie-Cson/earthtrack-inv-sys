@@ -1,0 +1,9 @@
+{
+  "editor.formatOnSave": true,
+  "typescript.format.enable": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.sortImports": "always"
+  },
+  "eslint.format.enable": true
+}
