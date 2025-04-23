@@ -1,4 +1,3 @@
-// create-product.dto.ts
 import { Category } from '@lib/types';
 import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
 

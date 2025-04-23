@@ -15,9 +15,12 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@earthtrack-inv-sys/util": ["packages/util/src/index.ts"],
       "@lib/object-id": ["packages/object-id/src/index.ts"],
+      "@lib/paginate": ["packages/pagination/src/index.ts"],
       "@lib/repository": ["packages/repository/src/index.ts"],
-      "@lib/types": ["packages/types/src/index.ts"]
+      "@lib/types": ["packages/types/src/index.ts"],
+      "@lib/util": ["packages/util/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
