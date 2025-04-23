@@ -1,7 +1,5 @@
-// paginate.ts
-import { Model, FilterQuery, SortOrder } from 'mongoose';
+import { FilterQuery, Model, SortOrder } from 'mongoose';
 import { PaginatedResponse, PaginateOptions } from './paginate.types';
-import { Logger } from '@nestjs/common';
 
 export async function paginate<T>(
   model: Model<T>,
