@@ -28,7 +28,7 @@ describe('ProductController.UpdateProduct', () => {
 
     const updatedProduct = await productRepository.find(product.id);
 
-    expect(response.body.success).toBe(true);
+    expect(response.body.data.updateProduct).toBe(true);
     expect(updatedProduct.name).toBe(updatedData.name);
     expect(updatedProduct.price).toBe(updatedData.price);
     expect(updatedProduct.description).toBe(updatedData.description);
