@@ -25,6 +25,7 @@ describe('ProductService', () => {
   describe('#updateProduct', () => {
     test.concurrent('should update a product', async () => {
       const { data: product } = generateProduct();
+      productRepository.find.mockResolvedValue(product);
 
       await productService.updateProduct(product.id, {
         name: product.name,
@@ -39,6 +40,7 @@ describe('ProductService', () => {
   describe('#deleteProduct', () => {
     test.concurrent('should delete a product', async () => {
       const { data: product } = generateProduct();
+      productRepository.find.mockResolvedValue(product);
 
       await productService.deleteProduct(product.id);
 
