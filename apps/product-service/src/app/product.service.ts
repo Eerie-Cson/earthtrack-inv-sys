@@ -45,6 +45,12 @@ export class ProductService {
     return normalizeDocument(product);
   }
 
+  async findProducts(params: FilterQuery<Product>) {
+    const products = await this.productRepository.list(params);
+
+    return products.map((product) => normalizeDocument(product));
+  }
+
   async listProducts(params: {
     limit: number;
     rawCursor?: string;

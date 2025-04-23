@@ -1,5 +1,5 @@
-import { ProductService } from './product.service';
 import { generateProduct } from '../tests/helpers/generate-product';
+import { ProductService } from './product.service';
 
 describe('ProductService', () => {
   const productRepository = {
@@ -62,13 +62,13 @@ describe('ProductService', () => {
     });
   });
 
-  describe('#listProducts', () => {
+  describe('#findProducts', () => {
     test.concurrent('should list products', async () => {
       const { times: productTimes } = generateProduct();
       const products = productTimes(3);
 
       productRepository.list.mockResolvedValue(products);
-      await productService.listProducts({});
+      await productService.findProducts({});
 
       expect(productRepository.list).toHaveBeenCalledWith({});
     });
