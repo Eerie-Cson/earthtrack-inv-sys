@@ -23,8 +23,6 @@ describe('ProductController.CreateProduct', () => {
       name: product.name,
     });
 
-    await teardown();
-
     expect(createdProduct).toHaveProperty('id');
     expect(response.body).not.toHaveProperty('errors');
     expect(response.body.data.createProduct).toBeTruthy();

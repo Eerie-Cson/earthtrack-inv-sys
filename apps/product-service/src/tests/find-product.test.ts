@@ -23,7 +23,6 @@ describe('ProductController.GetProductById', () => {
       `/api/products/${product.id.toString()}`
     );
 
-    console.log(response.body);
     expect(response.status).toBe(200);
     expect(response.body).not.toHaveProperty('errors');
     expect(response.body.data).toMatchObject({
@@ -53,6 +52,8 @@ describe('ProductController.GetProductById', () => {
     const response = await request.get(
       `/api/products/${nonExistentId.toString()}`
     );
+
+    await teardown();
 
     expect(response.status).toBe(200);
     expect(response.body).not.toHaveProperty('errors');
