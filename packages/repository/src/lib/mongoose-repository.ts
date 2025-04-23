@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Connection, FilterQuery, Model, Schema } from 'mongoose';
-import { Binary } from 'mongodb';
-import { Repository } from './repository';
 import { ObjectId } from '@lib/object-id';
+import { paginate, PaginatedResponse, PaginateOptions } from '@lib/paginate';
+import { Binary } from 'mongodb';
+import { Connection, FilterQuery, Model, Schema } from 'mongoose';
 import * as R from 'ramda';
+import { Repository } from './repository';
 
 export function serializeDeep(obj: any): any {
   if (obj instanceof ObjectId) return obj.toBuffer();
@@ -49,7 +50,11 @@ export function deserializeItem(item: any): any {
         key = 'id';
       }
 
-      result[key] = deserializeItem(value);
+      if (key.includes('cursor')) {
+        result[key] = value;
+      } else {
+        result[key] = deserializeItem(value);
+      }
     }
 
     return result;
@@ -93,5 +98,21 @@ export class MongooseRepository<TEntity extends { id: ObjectId }>
   public async list(filter?: FilterQuery<TEntity>) {
     const docs = await this._model.find(normalizeFilter(filter)).lean();
     return docs.map(deserializeItem);
+  }
+
+  public async paginateList(
+    filter: FilterQuery<Partial<TEntity>> = {},
+    options: PaginateOptions<TEntity>
+  ): Promise<PaginatedResponse<TEntity>> {
+    const result = await paginate(
+      this._model,
+      normalizeFilter(filter),
+      options
+    );
+
+    return {
+      ...result,
+      data: result.data.map(deserializeItem),
+    };
   }
 }
