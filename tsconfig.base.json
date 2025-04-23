@@ -16,7 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@lib/object-id": ["packages/object-id/src/index.ts"],
-      "@lib/repository": ["packages/repository/src/index.ts"]
+      "@lib/repository": ["packages/repository/src/index.ts"],
+      "@lib/types": ["packages/types/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
