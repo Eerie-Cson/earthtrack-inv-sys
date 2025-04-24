@@ -1,9 +1,9 @@
-import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { PassportModule } from '@nestjs/passport';
-import { UserModule } from '../../../user-service/src/app/user.module';
+import { join } from 'path';
 import { JwtStrategy } from '../../libs/jwt.strategy';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -13,12 +13,24 @@ import { AuthService } from './auth.service';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    HttpModule.registerAsync({
-      useFactory: () => ({
-        timeout: 5000,
-        maxRedirects: 5,
-      }),
-    }),
+    ClientsModule.registerAsync([
+      {
+        name: 'USER_SERVICE',
+        imports: [ConfigModule],
+        useFactory: (cfg: ConfigService) => ({
+          transport: Transport.GRPC,
+          options: {
+            package: 'user',
+            protoPath: join(
+              process.cwd(),
+              'packages/shared/src/proto/user.proto'
+            ),
+            url: cfg.get<string>('USER_GRPC_URL'),
+          },
+        }),
+        inject: [ConfigService],
+      },
+    ]),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: async (config: ConfigService) => {
@@ -28,7 +40,6 @@ import { AuthService } from './auth.service';
         };
       },
     }),
-    UserModule,
     PassportModule,
   ],
   providers: [AuthService, JwtStrategy],

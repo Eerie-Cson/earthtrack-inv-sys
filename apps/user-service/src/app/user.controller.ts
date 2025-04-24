@@ -7,6 +7,7 @@ import {
   Post,
   UnauthorizedException,
 } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
 import * as R from 'ramda';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
@@ -15,6 +16,7 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @GrpcMethod('UserService', 'CreateUser')
   @Post()
   async createUser(@Body() createUserInput: CreateUserDto) {
     await this.userService.createUser({
@@ -25,6 +27,7 @@ export class UserController {
     return { data: true };
   }
 
+  @GrpcMethod('UserService', 'ValidateUser')
   @Post('/validate')
   async validateUser(
     @Body() credentials: { username: string; password: string }
@@ -35,7 +38,7 @@ export class UserController {
     );
     //Add error handling if possible
     if (!user) throw new UnauthorizedException('Invalid credentials');
-    return { data: user };
+    return { data: { user } };
   }
 
   @Get('/:id')

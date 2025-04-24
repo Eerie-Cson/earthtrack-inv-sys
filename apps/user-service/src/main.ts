@@ -1,30 +1,22 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
-import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { join } from 'path';
 import { UserModule } from './app/user.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(UserModule);
-  const globalPrefix = 'api';
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    })
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    UserModule,
+    {
+      transport: Transport.GRPC,
+      options: {
+        package: 'user',
+        protoPath: join(process.cwd(), 'packages/shared/src/proto/user.proto'),
+        url: process.env.USER_GRPC_URL || '0.0.0.0:50051',
+      },
+    }
   );
-  app.setGlobalPrefix(globalPrefix);
-
-  const port = process.env.USER_PORT || 3000;
-  await app.listen(port);
-  Logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
-  );
+  await app.listen();
+  console.log('🚀 UserService gRPC listening on', process.env.USER_GRPC_URL);
 }
 
 bootstrap();

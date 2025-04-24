@@ -1,6 +1,6 @@
 import { User } from '@lib/types';
 import { normalizeDocument } from '@lib/util';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
 import { FilterQuery } from 'mongoose';
 import * as R from 'ramda';

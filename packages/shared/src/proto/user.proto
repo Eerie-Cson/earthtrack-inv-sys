@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package user;
+
+import "google/protobuf/empty.proto";
+
+message User {
+  string id = 1;
+  string username = 2;
+  string password = 3;
+  string role = 4;
+  string email = 5;
+  string firstname = 6;
+  string lastname = 7;
+}
+
+message Credentials {
+  string username = 1;
+  string password = 2;
+}
+
+message UserResponse {
+  User data = 1;
+}
+
+message BoolResponse {
+  bool data = 1;
+}
+
+message ValidateUserResponse {
+  message UserData {
+    User user = 1;
+  }
+  UserData data = 1;
+}
+
+service UserService {
+  rpc CreateUser(User) returns (BoolResponse);
+  rpc ValidateUser(Credentials) returns (ValidateUserResponse);
+}

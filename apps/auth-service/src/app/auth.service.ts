@@ -1,27 +1,23 @@
-import { HttpService } from '@nestjs/axios';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { User } from '@lib/types';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ClientGrpc } from '@nestjs/microservices';
+import * as R from 'ramda';
 import { firstValueFrom } from 'rxjs';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
+  private userService;
   constructor(
-    private readonly httpService: HttpService,
-    private jwtService: JwtService,
-    private readonly configService: ConfigService
-  ) {}
-
-  private get userServiceUrl(): string {
-    return this.configService.get('USER_SERVICE_URL');
+    @Inject('USER_SERVICE') private client: ClientGrpc,
+    private jwtService: JwtService
+  ) {
+    this.userService = this.client.getService('UserService');
   }
 
   async register(createUserInput: CreateUserDto) {
-    await firstValueFrom(
-      this.httpService.post(`${this.userServiceUrl}/users`, createUserInput)
-    );
-
+    await firstValueFrom(this.userService.CreateUser(createUserInput));
     return this.login({
       username: createUserInput.username,
       password: createUserInput.password,
@@ -29,28 +25,19 @@ export class AuthService {
   }
 
   async login(credentials: { username: string; password: string }) {
-    try {
-      const { data: user } = await firstValueFrom(
-        this.httpService.post(
-          `${this.userServiceUrl}/users/validate`,
-          credentials
-        )
-      );
+    const response = (await firstValueFrom(
+      this.userService.validateUser(credentials)
+    )) as any;
 
-      if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!response) throw new UnauthorizedException('Invalid credentials');
+    return this.generateTokenResponse(response.data.user as any);
+  }
 
-      const payload = {
-        sub: user.id,
-        username: user.username,
-        role: user.role,
-      };
-
-      return {
-        user,
-        accessToken: this.jwtService.sign(payload),
-      };
-    } catch (error) {
-      throw new UnauthorizedException('Authentication failed');
-    }
+  private generateTokenResponse(user: User) {
+    const payload = { sub: user.id, username: user.username, role: user.role };
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: R.omit(['password'], user),
+    };
   }
 }
