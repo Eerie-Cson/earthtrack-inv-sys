@@ -8,12 +8,13 @@ describe('ProductService', () => {
     delete: jest.fn(),
     find: jest.fn(),
     list: jest.fn(),
+    paginateList: jest.fn(),
   };
 
   const productService = new ProductService(productRepository as never);
 
   describe('#createProduct', () => {
-    test.concurrent('should create a new product', async () => {
+    test.concurrent('should call create with correct params', async () => {
       const { data: product } = generateProduct();
 
       await productService.createProduct(product);
@@ -23,7 +24,7 @@ describe('ProductService', () => {
   });
 
   describe('#updateProduct', () => {
-    test.concurrent('should update a product', async () => {
+    test.concurrent('should call update with correct params', async () => {
       const { data: product } = generateProduct();
       productRepository.find.mockResolvedValue(product);
 
@@ -38,7 +39,7 @@ describe('ProductService', () => {
   });
 
   describe('#deleteProduct', () => {
-    test.concurrent('should delete a product', async () => {
+    test.concurrent('should call delete with correct params', async () => {
       const { data: product } = generateProduct();
       productRepository.find.mockResolvedValue(product);
 
@@ -49,7 +50,7 @@ describe('ProductService', () => {
   });
 
   describe('#findProduct', () => {
-    test.concurrent('should find a product', async () => {
+    test.concurrent('should call find with correct params ', async () => {
       const { data: product } = generateProduct();
 
       productRepository.find.mockResolvedValue(product);
@@ -63,7 +64,7 @@ describe('ProductService', () => {
   });
 
   describe('#findProducts', () => {
-    test.concurrent('should list products', async () => {
+    test.concurrent('should call list with the correct params', async () => {
       const { times: productTimes } = generateProduct();
       const products = productTimes(3);
 
@@ -72,5 +73,46 @@ describe('ProductService', () => {
 
       expect(productRepository.list).toHaveBeenCalledWith({});
     });
+  });
+
+  describe('#listProducts', () => {
+    test.concurrent(
+      'should call paginateList with the correct params',
+      async () => {
+        const { data: product } = generateProduct();
+        const cursor = Buffer.from('next-cursor');
+        const paginateResult = {
+          data: [product],
+          nextCursor: cursor,
+        };
+
+        productRepository.paginateList = jest
+          .fn()
+          .mockResolvedValue(paginateResult);
+
+        await productService.listProducts({
+          limit: 10,
+          sort: 'asc',
+          cursor: undefined,
+          filter: {
+            name: product.name,
+          },
+        });
+
+        expect(productRepository.paginateList).toHaveBeenCalledWith(
+          {
+            name: {
+              $options: 'i',
+              $regex: product.name,
+            },
+          },
+          {
+            limit: 10,
+            sort: 'asc',
+            cursor: undefined,
+          }
+        );
+      }
+    );
   });
 });
