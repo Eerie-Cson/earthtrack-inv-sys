@@ -1,5 +1,5 @@
 import { Category } from '@lib/types';
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsIn, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateProductDto {
   @IsNotEmpty()
@@ -10,7 +10,7 @@ export class CreateProductDto {
   description?: string;
 
   @IsNotEmpty()
-  @IsString()
+  @IsIn(Object.values(Category))
   category: Category;
 
   @IsNotEmpty()
