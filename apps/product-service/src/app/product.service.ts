@@ -1,6 +1,6 @@
 import { ObjectId } from '@lib/object-id';
 import { PaginateOptions } from '@lib/paginate';
-import { Category, Product } from '@lib/types';
+import { Product } from '@lib/types';
 import { normalizeDocument } from '@lib/util';
 import { Inject, Injectable } from '@nestjs/common';
 import { FilterQuery } from 'mongoose';
@@ -53,27 +53,27 @@ export class ProductService {
 
   async listProducts(params: {
     limit: number;
-    rawCursor?: string;
+    cursor?: string;
     sort: 'asc' | 'desc';
-    category?: Category;
-    priceMin?: number;
-    priceMax?: number;
+    filter: {
+      name?: string;
+      description?: string;
+    };
   }) {
     const filter: FilterQuery<Product> = {};
 
-    if (params.category) filter.category = params.category;
-    if (params.priceMin || params.priceMax) {
-      filter.price = {};
-      if (params.priceMin) filter.price.$gte = params.priceMin;
-      if (params.priceMax) filter.price.$lte = params.priceMax;
+    if (params.filter.name) {
+      filter.name = { $regex: params.filter.name, $options: 'i' };
+    }
+
+    if (params.filter.description) {
+      filter.description = { $regex: params.filter.description, $options: 'i' };
     }
 
     const options: PaginateOptions<Partial<Product>> = {
       limit: params.limit,
       sort: params.sort,
-      cursor: params.rawCursor
-        ? Buffer.from(params.rawCursor, 'base64')
-        : undefined,
+      cursor: params.cursor ? Buffer.from(params.cursor, 'base64') : undefined,
     };
 
     const result = await this.productRepository.paginateList(filter, options);

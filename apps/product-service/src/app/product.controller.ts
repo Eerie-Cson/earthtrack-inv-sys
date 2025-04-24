@@ -49,11 +49,12 @@ export class ProductController {
   async getPaginatedProducts(@Query() params: ProductListQueryDto) {
     return this.productService.listProducts({
       limit: params.limit,
-      rawCursor: params.cursor,
+      cursor: params.cursor,
       sort: params.sort,
-      category: params.category,
-      priceMin: params.priceMin,
-      priceMax: params.priceMax,
+      filter: {
+        name: params.name,
+        description: params.description,
+      },
     });
   }
 }

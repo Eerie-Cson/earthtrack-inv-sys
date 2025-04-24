@@ -26,18 +26,10 @@ export class ProductListQueryDto {
   sort?: 'asc' | 'desc' = 'asc';
 
   @IsOptional()
-  @IsIn(Object.values(Category))
-  category?: Category;
+  @IsString()
+  name?: string;
 
   @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  priceMin?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  priceMax?: number;
+  @IsString()
+  description?: string;
 }
