@@ -8,13 +8,13 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  async createUser(@Body() createUserInput: CreateUserDto) {
+  async registerUser(@Body() createUserInput: CreateUserDto) {
     await this.userService.createUser({
       ...createUserInput,
       id: ObjectId.generate(ObjectType.ACCOUNT),
     });
 
-    return true;
+    return { data: true };
   }
 
   @Get('/:id')
