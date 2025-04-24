@@ -1,4 +1,4 @@
-import { Tokens } from '../app/libs/tokens';
+import { Token } from '../app/libs/tokens';
 import { ProductRepository } from '../app/repository/product.repository';
 import { generateProduct } from './helpers/generate-product';
 import { setupFixture } from './helpers/setup-fixture';
@@ -7,7 +7,7 @@ describe('ProductController.GetPaginatedProducts', () => {
   test.concurrent('should paginate products correctly', async () => {
     const { request, module, teardown } = await setupFixture();
     const productRepository = module.get<ProductRepository>(
-      Tokens.ProductRepository
+      Token.ProductRepository
     );
 
     const products = generateProduct().times(18);
@@ -53,7 +53,7 @@ describe('ProductController.GetPaginatedProducts', () => {
     async () => {
       const { request, module, teardown } = await setupFixture();
       const productRepository = module.get<ProductRepository>(
-        Tokens.ProductRepository
+        Token.ProductRepository
       );
 
       const partialName = 'product';
@@ -137,7 +137,7 @@ describe('ProductController.GetPaginatedProducts', () => {
     async () => {
       const { request, module, teardown } = await setupFixture();
       const productRepository = module.get<ProductRepository>(
-        Tokens.ProductRepository
+        Token.ProductRepository
       );
 
       const partialDescription = 'special-';

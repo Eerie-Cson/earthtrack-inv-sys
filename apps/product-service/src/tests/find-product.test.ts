@@ -1,15 +1,15 @@
 import { ObjectId, ObjectType } from '@lib/object-id';
-import { Tokens } from '../app/libs/tokens';
+import * as R from 'ramda';
+import { Token } from '../app/libs/tokens';
 import { ProductRepository } from '../app/repository/product.repository';
 import { generateProduct } from './helpers/generate-product';
 import { setupFixture } from './helpers/setup-fixture';
-import * as R from 'ramda';
 
 describe('ProductController.GetProductById', () => {
   test.concurrent('should return the product by ID', async () => {
     const { request, module, teardown } = await setupFixture();
     const productRepository = module.get<ProductRepository>(
-      Tokens.ProductRepository
+      Token.ProductRepository
     );
 
     const products = generateProduct().times(3);
@@ -39,7 +39,7 @@ describe('ProductController.GetProductById', () => {
   test.concurrent('should return null given no product found', async () => {
     const { request, module, teardown } = await setupFixture();
     const productRepository = module.get<ProductRepository>(
-      Tokens.ProductRepository
+      Token.ProductRepository
     );
 
     const products = generateProduct().times(3);

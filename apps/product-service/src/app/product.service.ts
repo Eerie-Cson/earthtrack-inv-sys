@@ -5,13 +5,13 @@ import { normalizeDocument } from '@lib/util';
 import { Inject, Injectable } from '@nestjs/common';
 import { FilterQuery } from 'mongoose';
 import { ProductNotFoundError } from '../error';
-import { Tokens } from './libs/tokens';
+import { Token } from './libs/tokens';
 import { ProductRepository } from './repository/product.repository';
 
 @Injectable()
 export class ProductService {
   constructor(
-    @Inject(Tokens.ProductRepository)
+    @Inject(Token.ProductRepository)
     private readonly productRepository: ProductRepository
   ) {}
 

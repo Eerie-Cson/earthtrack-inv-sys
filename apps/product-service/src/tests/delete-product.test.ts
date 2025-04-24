@@ -1,15 +1,15 @@
 import { ObjectId, ObjectType } from '@lib/object-id';
-import { Tokens } from '../app/libs/tokens';
+import { Token } from '../app/libs/tokens';
 import { ProductRepository } from '../app/repository/product.repository';
+import { ProductNotFoundError } from '../error';
 import { generateProduct } from './helpers/generate-product';
 import { setupFixture } from './helpers/setup-fixture';
-import { ProductNotFoundError } from '../error';
 
 describe('ProductController.DeleteProduct', () => {
   test.concurrent('should delete a product by ID', async () => {
     const { request, module, teardown } = await setupFixture();
     const productRepository = module.get<ProductRepository>(
-      Tokens.ProductRepository
+      Token.ProductRepository
     );
 
     const { data: product } = generateProduct();
@@ -28,7 +28,7 @@ describe('ProductController.DeleteProduct', () => {
   test.concurrent('should throw error given no product found', async () => {
     const { request, module, teardown } = await setupFixture();
     const productRepository = module.get<ProductRepository>(
-      Tokens.ProductRepository
+      Token.ProductRepository
     );
 
     const { data: product } = generateProduct();

@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
+import { Token } from './libs/tokens';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
-import { Tokens } from './libs/tokens';
 import { ProductRepositoryFactory } from './repository/product.repository';
-import { getConnectionToken } from '@nestjs/mongoose';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -21,7 +20,7 @@ import { MongooseModule } from '@nestjs/mongoose';
   controllers: [ProductController],
   providers: [
     {
-      provide: Tokens.ProductRepository,
+      provide: Token.ProductRepository,
       useFactory: ProductRepositoryFactory,
       inject: [getConnectionToken()],
     },

@@ -1,3 +1,3 @@
-export const Tokens = {
+export const Token = {
   ProductRepository: Symbol('ProductRepository'),
 };
