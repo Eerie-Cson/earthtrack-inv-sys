@@ -1,8 +1,9 @@
 import { User } from '@lib/types';
 import { normalizeDocument } from '@lib/util';
-import { Inject, Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import bcrypt from 'bcrypt';
 import { FilterQuery } from 'mongoose';
+import * as R from 'ramda';
 import { Token } from './libs/token';
 import { UserRepository } from './repository/user.repository';
 
@@ -31,7 +32,7 @@ export class UserService {
   async validateUser(username: string, password: string) {
     const user = await this.findUser({ username: username });
     if (user && (await bcrypt.compare(password, user.password))) {
-      return user;
+      return R.omit(['password'], user);
     }
     return null;
   }

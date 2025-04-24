@@ -1,3 +1,4 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -11,6 +12,12 @@ import { AuthService } from './auth.service';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    HttpModule.registerAsync({
+      useFactory: () => ({
+        timeout: 5000,
+        maxRedirects: 5,
+      }),
     }),
     JwtModule.registerAsync({
       inject: [ConfigService],
