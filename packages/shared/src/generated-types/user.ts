@@ -7,10 +7,11 @@
 /* eslint-disable */
 import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
 import { Observable } from "rxjs";
+import { Timestamp } from "./google/protobuf/timestamp";
 
 export const protobufPackage = "user";
 
-export interface User {
+export interface UserWithCredentials {
   id: string;
   username: string;
   password: string;
@@ -18,6 +19,8 @@ export interface User {
   email: string;
   firstname: string;
   lastname: string;
+  dateTimeCreated: Timestamp | undefined;
+  dateTimeLastUpdated: Timestamp | undefined;
 }
 
 export interface Credentials {
@@ -34,11 +37,22 @@ export interface CreateUserRequest {
 }
 
 export interface UserResponse {
-  data: User | undefined;
+  data: UserWithCredentials | undefined;
 }
 
 export interface BoolResponse {
   data: boolean;
+}
+
+export interface User {
+  id: string;
+  username: string;
+  role: string;
+  email: string;
+  firstname: string;
+  lastname: string;
+  dateTimeCreated: Timestamp | undefined;
+  dateTimeLastUpdated: Timestamp | undefined;
 }
 
 export interface ValidateUserResponse {
@@ -52,13 +66,13 @@ export interface ValidateUserResponse_UserData {
 export const USER_PACKAGE_NAME = "user";
 
 export interface UserServiceClient {
-  createUser(request: User): Observable<BoolResponse>;
+  createUser(request: UserWithCredentials): Observable<BoolResponse>;
 
   validateUser(request: Credentials): Observable<ValidateUserResponse>;
 }
 
 export interface UserServiceController {
-  createUser(request: User): Promise<BoolResponse> | Observable<BoolResponse> | BoolResponse;
+  createUser(request: UserWithCredentials): Promise<BoolResponse> | Observable<BoolResponse> | BoolResponse;
 
   validateUser(
     request: Credentials,

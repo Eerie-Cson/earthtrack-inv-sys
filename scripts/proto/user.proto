@@ -2,8 +2,9 @@ syntax = "proto3";
 
 package user;
 
+import "google/protobuf/timestamp.proto";
 
-message User {
+message UserWithCredentials {
   string id = 1;
   string username = 2;
   string password = 3;
@@ -11,6 +12,8 @@ message User {
   string email = 5;
   string firstname = 6;
   string lastname = 7;
+  google.protobuf.Timestamp dateTimeCreated = 8;
+  google.protobuf.Timestamp dateTimeLastUpdated = 9;
 }
 
 message Credentials {
@@ -27,11 +30,22 @@ message CreateUserRequest {
 }
 
 message UserResponse {
-  User data = 1;
+  UserWithCredentials data = 1;
 }
 
 message BoolResponse {
   bool data = 1;
+}
+
+message User {
+  string id = 1;
+  string username = 2;
+  string role = 3;
+  string email = 4;
+  string firstname = 5;
+  string lastname = 6;
+  google.protobuf.Timestamp dateTimeCreated = 7;
+  google.protobuf.Timestamp dateTimeLastUpdated = 8;
 }
 
 message ValidateUserResponse {
@@ -42,6 +56,6 @@ message ValidateUserResponse {
 }
 
 service UserService {
-  rpc CreateUser(User) returns (BoolResponse);
+  rpc CreateUser(UserWithCredentials) returns (BoolResponse);
   rpc ValidateUser(Credentials) returns (ValidateUserResponse);
 }
