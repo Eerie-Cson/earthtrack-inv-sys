@@ -1,6 +1,8 @@
+import { JwtStrategy } from '@lib/auth';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
+import { PassportModule } from '@nestjs/passport';
 import { Token } from './libs/tokens';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
@@ -16,6 +18,7 @@ import { ProductRepositoryFactory } from './repository/product.repository';
       }),
       inject: [ConfigService],
     }),
+    PassportModule,
   ],
   controllers: [ProductController],
   providers: [
@@ -25,6 +28,7 @@ import { ProductRepositoryFactory } from './repository/product.repository';
       inject: [getConnectionToken()],
     },
     ProductService,
+    JwtStrategy,
   ],
 })
 export class ProductModule {}

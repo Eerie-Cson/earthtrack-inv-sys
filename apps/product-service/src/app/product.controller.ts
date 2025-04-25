@@ -7,13 +7,17 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { ProductService } from './product.service';
 
+import { JwtAuthGuard, Roles, RolesGuard } from '@lib/auth';
 import { ObjectId, ObjectType } from '@lib/object-id';
+import { AccountRole } from '@lib/types';
 import { ProductListQueryDto } from './dto/product-list-query.dto';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -27,12 +31,14 @@ export class ProductController {
     return { data: { createProduct: true } };
   }
 
+  @Roles(AccountRole.Auditor, AccountRole.Admin)
   @Put(':id')
   async updateProduct(@Param('id') id: string, @Body() dto: UpdateProductDto) {
     await this.productService.updateProduct(ObjectId.from(id), dto);
     return { data: { updateProduct: true } };
   }
 
+  @Roles(AccountRole.Admin)
   @Delete(':id')
   async deleteProduct(@Param('id') id: string) {
     await this.productService.deleteProduct(ObjectId.from(id));
@@ -45,6 +51,7 @@ export class ProductController {
     return { data: product };
   }
 
+  @Roles(AccountRole.Auditor, AccountRole.Admin, AccountRole.User)
   @Get()
   async getPaginatedProducts(@Query() params: ProductListQueryDto) {
     return this.productService.listProducts({
