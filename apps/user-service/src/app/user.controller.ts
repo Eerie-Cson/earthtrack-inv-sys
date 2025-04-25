@@ -1,15 +1,13 @@
 import { ObjectId, ObjectType } from '@lib/object-id';
+import { CreateUserRequest } from '@lib/shared';
+import { AccountRole } from '@lib/types';
+import { Body, Controller, Get, Param, Post, UseFilters } from '@nestjs/common';
 import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { GrpcMethod } from '@nestjs/microservices';
+  BaseRpcExceptionFilter,
+  GrpcMethod,
+  RpcException,
+} from '@nestjs/microservices';
 import * as R from 'ramda';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -18,15 +16,17 @@ export class UserController {
 
   @GrpcMethod('UserService', 'CreateUser')
   @Post()
-  async createUser(@Body() createUserInput: CreateUserDto) {
+  async createUser(@Body() createUserInput: CreateUserRequest) {
     await this.userService.createUser({
       id: ObjectId.generate(ObjectType.ACCOUNT),
+      role: AccountRole.User,
       ...createUserInput,
     });
 
     return { data: true };
   }
 
+  @UseFilters(new BaseRpcExceptionFilter())
   @GrpcMethod('UserService', 'ValidateUser')
   @Post('/validate')
   async validateUser(
@@ -37,7 +37,7 @@ export class UserController {
       credentials.password
     );
     //Add error handling if possible
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user) throw new RpcException('Invalid credentials');
     return { data: { user } };
   }
 

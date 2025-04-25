@@ -4,7 +4,6 @@ import { JwtService } from '@nestjs/jwt';
 import { ClientGrpc } from '@nestjs/microservices';
 import * as R from 'ramda';
 import { firstValueFrom } from 'rxjs';
-import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +15,8 @@ export class AuthService {
     this.userService = this.client.getService('UserService');
   }
 
-  async register(createUserInput: CreateUserDto) {
+  // FOR FUTURE PURPOSE
+  async register(createUserInput: Omit<User, 'id' | 'role'>) {
     await firstValueFrom(this.userService.CreateUser(createUserInput));
     return this.login({
       username: createUserInput.username,
