@@ -1,10 +1,10 @@
+import { JwtStrategy } from '@lib/auth';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { PassportModule } from '@nestjs/passport';
 import { join } from 'path';
-import { JwtStrategy } from '../../libs/jwt.strategy';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
@@ -21,10 +21,7 @@ import { AuthService } from './auth.service';
           transport: Transport.GRPC,
           options: {
             package: 'user',
-            protoPath: join(
-              process.cwd(),
-              'packages/shared/src/proto/user.proto'
-            ),
+            protoPath: join(process.cwd(), 'scripts/proto/user.proto'),
             url: cfg.get<string>('USER_GRPC_URL'),
           },
         }),

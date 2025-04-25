@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package user;
 
-import "google/protobuf/empty.proto";
 
 message User {
   string id = 1;
@@ -17,6 +16,14 @@ message User {
 message Credentials {
   string username = 1;
   string password = 2;
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string password = 2;
+  string email = 3;
+  string firstname = 4;
+  string lastname = 5;
 }
 
 message UserResponse {
