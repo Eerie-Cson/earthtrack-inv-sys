@@ -10,9 +10,9 @@
   },
   "include": [
     "src/**/*.ts",
-    "libs/roles.guard.ts",
-    "libs/roles.decorator.ts",
-    "libs/jwt.strategy.ts"
+    "../../packages/auth/src/lib/guards/roles.guard.ts",
+    "../../packages/auth/src/lib/decorators/roles.decorator.ts",
+    "../../packages/auth/src/lib/jwt.strategy.ts"
   ],
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
 }

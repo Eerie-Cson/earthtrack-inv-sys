@@ -15,9 +15,11 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@lib/auth": ["packages/auth/src/index.ts"],
       "@lib/object-id": ["packages/object-id/src/index.ts"],
       "@lib/paginate": ["packages/pagination/src/index.ts"],
       "@lib/repository": ["packages/repository/src/index.ts"],
+      "@lib/shared": ["packages/shared/src/index.ts"],
       "@lib/types": ["packages/types/src/index.ts"],
       "@lib/util": ["packages/util/src/index.ts"]
     }

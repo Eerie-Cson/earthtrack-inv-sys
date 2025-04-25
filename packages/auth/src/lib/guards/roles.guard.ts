@@ -6,7 +6,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ROLES_KEY } from './roles.decorator';
+import { ROLES_KEY } from '../decorators/roles.decorator';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -26,7 +26,7 @@ export class RolesGuard implements CanActivate {
     const user = request.user;
 
     if (!user || !requiredRoles.includes(user.role)) {
-      throw new ForbiddenException('Insufficient role privileges');
+      throw new ForbiddenException('You are not allowed to do this action');
     }
 
     return true;
