@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
-import { Category, Product } from '@lib/types';
 import { ObjectId, ObjectType } from '@lib/object-id';
+import { Category, Product } from '@lib/types';
 import * as R from 'ramda';
 
 export function generateProduct() {

@@ -51,7 +51,6 @@ export class ProductController {
     return { data: product };
   }
 
-  @Roles(AccountRole.Auditor, AccountRole.Admin, AccountRole.User)
   @Get()
   async getPaginatedProducts(@Query() params: ProductListQueryDto) {
     return this.productService.listProducts({

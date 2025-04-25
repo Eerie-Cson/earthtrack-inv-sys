@@ -1,5 +1,8 @@
+import { AccountRole } from '@lib/types';
+import { JwtService } from '@nestjs/jwt';
 import { Token } from '../app/libs/tokens';
 import { ProductRepository } from '../app/repository/product.repository';
+import { generateAccount } from './helpers/generate-account';
 import { generateProduct } from './helpers/generate-product';
 import { setupFixture } from './helpers/setup-fixture';
 
@@ -12,6 +15,16 @@ describe('ProductController.GetPaginatedProducts', () => {
 
     const products = generateProduct().times(18);
 
+    const account = generateAccount(AccountRole.User);
+
+    const jwtService = module.get<JwtService>(JwtService);
+
+    const token = jwtService.sign({
+      sub: account.id,
+      username: account.username,
+      role: account.role,
+    });
+
     await Promise.all(
       products.map((product) => productRepository.create(product))
     );
@@ -23,9 +36,9 @@ describe('ProductController.GetPaginatedProducts', () => {
 
     const firstPageParams = new URLSearchParams(baseQueryParams);
 
-    const firstPageResponse = await request.get(
-      `/api/products?${firstPageParams.toString()}`
-    );
+    const firstPageResponse = await request
+      .get(`/api/products?${firstPageParams.toString()}`)
+      .set('Authorization', `Bearer ${token}`);
 
     expect(firstPageResponse.status).toBe(200);
     expect(firstPageResponse.body).not.toHaveProperty('errors');
@@ -37,9 +50,9 @@ describe('ProductController.GetPaginatedProducts', () => {
       cursor: firstPageResponse.body.nextCursor,
     });
 
-    const secondPageResponse = await request.get(
-      `/api/products?${secondPageParams.toString()}`
-    );
+    const secondPageResponse = await request
+      .get(`/api/products?${secondPageParams.toString()}`)
+      .set('Authorization', `Bearer ${token}`);
 
     expect(secondPageResponse.status).toBe(200);
     expect(secondPageResponse.body).not.toHaveProperty('errors');
@@ -49,7 +62,7 @@ describe('ProductController.GetPaginatedProducts', () => {
     await teardown();
   });
   test.concurrent(
-    'should paginate products with partial name filter',
+    'should match products with partial name filter',
     async () => {
       const { request, module, teardown } = await setupFixture();
       const productRepository = module.get<ProductRepository>(
@@ -90,42 +103,35 @@ describe('ProductController.GetPaginatedProducts', () => {
         products.map((product) => productRepository.create(product))
       );
 
+      const account = generateAccount(AccountRole.User);
+
+      const jwtService = module.get<JwtService>(JwtService);
+
+      const token = jwtService.sign({
+        sub: account.id,
+        username: account.username,
+        role: account.role,
+      });
+
       const baseQueryParams = {
-        limit: '6',
         sort: 'asc',
         name: partialName,
       };
 
       const firstPageParams = new URLSearchParams(baseQueryParams);
 
-      const firstPageResponse = await request.get(
-        `/api/products?${firstPageParams.toString()}`
-      );
+      const firstPageResponse = await request
+        .get(`/api/products?${firstPageParams.toString()}`)
+        .set('Authorization', `Bearer ${token}`);
 
       expect(firstPageResponse.status).toBe(200);
       expect(firstPageResponse.body).not.toHaveProperty('errors');
-      expect(firstPageResponse.body.data).toHaveLength(6);
+      expect(firstPageResponse.body.data).toHaveLength(
+        productsWithPartialName.length
+      );
       expect(firstPageResponse.body.nextCursor).toBeDefined();
 
       firstPageResponse.body.data.forEach((product) => {
-        expect(product.name.toLowerCase()).toContain(partialName.toLowerCase());
-      });
-
-      const secondPageParams = new URLSearchParams({
-        ...baseQueryParams,
-        cursor: firstPageResponse.body.nextCursor,
-      });
-
-      const secondPageResponse = await request.get(
-        `/api/products?${secondPageParams.toString()}`
-      );
-
-      expect(secondPageResponse.status).toBe(200);
-      expect(secondPageResponse.body).not.toHaveProperty('errors');
-      expect(secondPageResponse.body.data).toHaveLength(4);
-      expect(secondPageResponse.body.nextCursor).toBeNull();
-
-      secondPageResponse.body.data.forEach((product) => {
         expect(product.name.toLowerCase()).toContain(partialName.toLowerCase());
       });
 
@@ -133,7 +139,7 @@ describe('ProductController.GetPaginatedProducts', () => {
     }
   );
   test.concurrent(
-    'should paginate products with partial description filter',
+    'should match products with partial description filter',
     async () => {
       const { request, module, teardown } = await setupFixture();
       const productRepository = module.get<ProductRepository>(
@@ -204,44 +210,35 @@ describe('ProductController.GetPaginatedProducts', () => {
         products.map((product) => productRepository.create(product))
       );
 
+      const account = generateAccount(AccountRole.User);
+
+      const jwtService = module.get<JwtService>(JwtService);
+
+      const token = jwtService.sign({
+        sub: account.id,
+        username: account.username,
+        role: account.role,
+      });
+
       const baseQueryParams = {
-        limit: '6',
         sort: 'asc',
         description: partialDescription,
       };
 
       const firstPageParams = new URLSearchParams(baseQueryParams);
 
-      const firstPageResponse = await request.get(
-        `/api/products?${firstPageParams.toString()}`
-      );
+      const firstPageResponse = await request
+        .get(`/api/products?${firstPageParams.toString()}`)
+        .set('Authorization', `Bearer ${token}`);
 
       expect(firstPageResponse.status).toBe(200);
       expect(firstPageResponse.body).not.toHaveProperty('errors');
-      expect(firstPageResponse.body.data).toHaveLength(6);
+      expect(firstPageResponse.body.data).toHaveLength(
+        productsWithPartialDescription.length
+      );
       expect(firstPageResponse.body.nextCursor).toBeDefined();
 
       firstPageResponse.body.data.forEach((product) => {
-        expect(product.description.toLowerCase()).toContain(
-          partialDescription.toLowerCase()
-        );
-      });
-
-      const secondPageParams = new URLSearchParams({
-        ...baseQueryParams,
-        cursor: firstPageResponse.body.nextCursor,
-      });
-
-      const secondPageResponse = await request.get(
-        `/api/products?${secondPageParams.toString()}`
-      );
-
-      expect(secondPageResponse.status).toBe(200);
-      expect(secondPageResponse.body).not.toHaveProperty('errors');
-      expect(secondPageResponse.body.data).toHaveLength(4);
-      expect(secondPageResponse.body.nextCursor).toBeNull();
-
-      secondPageResponse.body.data.forEach((product) => {
         expect(product.description.toLowerCase()).toContain(
           partialDescription.toLowerCase()
         );

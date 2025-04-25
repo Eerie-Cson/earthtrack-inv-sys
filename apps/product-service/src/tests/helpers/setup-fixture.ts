@@ -1,10 +1,11 @@
+import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import { getRandomPort } from 'get-port-please';
 import { MongoMemoryReplSet } from 'mongodb-memory-server';
-import { ProductModule } from '../../app/product.module';
-import { ConfigService } from '@nestjs/config';
 import supertest from 'supertest';
-import { ValidationPipe } from '@nestjs/common';
+import { ProductModule } from '../../app/product.module';
 
 export async function setupFixture(opts?: {
   mocks?: [
@@ -28,13 +29,21 @@ export async function setupFixture(opts?: {
     ],
   });
 
+  const jwtSecret = 'test_jwt_secret';
+
   let builder = Test.createTestingModule({
-    imports: [ProductModule],
+    imports: [
+      ProductModule,
+      JwtModule.register({
+        secret: jwtSecret,
+      }),
+    ],
   })
     .overrideProvider(ConfigService)
     .useValue(
       new ConfigService({
         PRODUCT_URI: mongo.getUri('PRODUCT_URI'),
+        JWT_SECRET_KEY: jwtSecret,
       })
     );
 
