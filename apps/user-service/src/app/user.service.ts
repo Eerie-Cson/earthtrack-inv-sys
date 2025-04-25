@@ -30,7 +30,7 @@ export class UserService {
   }
 
   async validateUser(username: string, password: string) {
-    const user = await this.findUser({ username: username });
+    const user = await this.findUser({ username, password });
     if (user && (await bcrypt.compare(password, user.password))) {
       return R.omit(['password'], user);
     }
