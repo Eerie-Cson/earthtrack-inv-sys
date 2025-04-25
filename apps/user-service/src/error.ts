@@ -1,58 +1,71 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { status as GrpcStatus } from '@grpc/grpc-js';
+import { HttpStatus } from '@nestjs/common';
 
-export class AccountError extends HttpException {
+export class UserError extends Error {
   public readonly code: string;
+  public readonly httpStatus: HttpStatus;
+  public readonly grpcStatus: GrpcStatus;
   public readonly metadata?: any;
 
   constructor(
     code: string,
     message: string,
-    status: HttpStatus,
+    httpStatus: HttpStatus,
+    grpcStatus: GrpcStatus,
     metadata?: any
   ) {
-    super(
-      {
-        code,
-        message,
-        metadata,
-      },
-      status
-    );
-
+    super(message);
+    this.name = 'UserError';
     this.code = code;
+    this.httpStatus = httpStatus;
+    this.grpcStatus = grpcStatus;
     this.metadata = metadata;
   }
 }
 
-export class AccountNotFoundError extends AccountError {
-  constructor(accountId: string) {
+export class UserNotFoundError extends UserError {
+  constructor(userId: string) {
     super(
-      'ACCOUNT_NOT_FOUND',
-      `Account ${accountId} does not exist.`,
+      'USER_NOT_FOUND',
+      `User with ID ${userId} does not exist.`,
       HttpStatus.NOT_FOUND,
-      { accountId }
+      GrpcStatus.NOT_FOUND,
+      { userId }
     );
   }
 }
 
-export class AccountCreationError extends AccountError {
+export class UserCreationError extends UserError {
   constructor(reason: string, metadata?: any) {
     super(
-      'ACCOUNT_CREATION_FAILED',
-      `Failed to create product: ${reason}`,
+      'USER_CREATION_FAILED',
+      `Failed to create user: ${reason}`,
       HttpStatus.BAD_REQUEST,
+      GrpcStatus.INVALID_ARGUMENT,
       metadata
     );
   }
 }
 
-export class InvalidInputError extends AccountError {
-  constructor(reason: string, metadata?: any) {
+export class InvalidCredentialsError extends UserError {
+  constructor() {
     super(
-      'INVALID_INPUT',
-      `Invalid input: ${reason}`,
-      HttpStatus.UNPROCESSABLE_ENTITY,
-      metadata
+      'INVALID_CREDENTIALS',
+      'Invalid username or password',
+      HttpStatus.UNAUTHORIZED,
+      GrpcStatus.UNAUTHENTICATED
+    );
+  }
+}
+
+export class DuplicateUsernameError extends UserError {
+  constructor(username: string) {
+    super(
+      'DUPLICATE_USERNAME',
+      `Username ${username} already exists`,
+      HttpStatus.CONFLICT,
+      GrpcStatus.ALREADY_EXISTS,
+      { username }
     );
   }
 }

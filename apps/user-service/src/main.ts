@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
@@ -16,7 +17,7 @@ async function bootstrap() {
     }
   );
   await app.listen();
-  console.log('🚀 UserService gRPC listening on', process.env.USER_GRPC_URL);
+  Logger.log('🚀 UserService gRPC listening on', process.env.USER_GRPC_URL);
 }
 
 bootstrap();
