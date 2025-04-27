@@ -1,7 +1,7 @@
-import { Connection, Schema } from 'mongoose';
 import { MongooseRepository, Repository } from '@lib/repository';
 import { Product } from '@lib/types';
 import * as crypto from 'crypto';
+import { Connection, Schema } from 'mongoose';
 
 export type ProductRepository = Repository<Product>;
 
@@ -52,6 +52,8 @@ export function ProductRepositoryFactory(connection: Connection) {
     }
     next();
   });
+
+  schema.index({ cursor: 1 });
 
   return new MongooseRepository<Product>(connection, 'Product', schema);
 }
