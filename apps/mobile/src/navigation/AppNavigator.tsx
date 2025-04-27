@@ -1,46 +1,19 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { StatusBar } from 'react-native';
+import { useAuth } from '../contexts/AuthContext';
 
 import LoginScreen from '../screens/auth/LoginScreen';
 import HomeScreen from '../screens/home/HomeScreen';
+import ProductListingScreen from '../screens/product/ProductListingScreen';
+import ProfileScreen from '../screens/profile/ProfileScreen';
+import SettingsScreen from '../screens/settings/SettingsScreen';
 
-import { useAuth } from '../context/AuthContext';
-
-const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const ProductStack = () => (
-  <Stack.Navigator id={undefined} screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="HomeMain" component={HomeScreen} />
-  </Stack.Navigator>
-);
-
-const MainTabs = () => (
-  <Tab.Navigator
-    id={undefined}
-    screenOptions={() => ({
-      tabBarIcon: ({ focused, color, size }) => {
-        const iconName: string = focused ? 'home' : 'home-outline';
-
-        return <Ionicons name={iconName as any} size={size} color={color} />;
-      },
-    })}
-  >
-    <Tab.Screen name="Home" component={ProductStack} />
-  </Tab.Navigator>
-);
-
-const AuthStack = () => (
-  <Stack.Navigator id={undefined} screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="Login" component={LoginScreen} />
-  </Stack.Navigator>
-);
-
-export default function AppNavigator() {
-  const { isAuthenticated, isLoading } = useAuth();
+const AppNavigator: React.FC = () => {
+  const { user, isLoading } = useAuth();
 
   if (isLoading) {
     return null;
@@ -48,7 +21,24 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      {isAuthenticated ? <MainTabs /> : <AuthStack />}
+      <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
+      <Stack.Navigator id={undefined} screenOptions={{ headerShown: false }}>
+        {!user ? (
+          <Stack.Screen name="Login" component={LoginScreen} />
+        ) : (
+          <>
+            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen
+              name="ProductListing"
+              component={ProductListingScreen}
+            />
+            <Stack.Screen name="Settings" component={SettingsScreen} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+          </>
+        )}
+      </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};
+
+export default AppNavigator;

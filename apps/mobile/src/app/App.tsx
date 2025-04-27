@@ -1,21 +1,19 @@
 import React from 'react';
-import { StatusBar } from 'react-native';
-import 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { AuthProvider } from '../context/AuthContext';
+import { AuthProvider } from '../contexts/AuthContext';
+import { SettingsProvider } from '../contexts/SettingsContext';
 import AppNavigator from '../navigation/AppNavigator';
 
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
-export default function App() {
+const App: React.FC = () => {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <StatusBar barStyle="dark-content" backgroundColor="blue" />
-        <AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <SettingsProvider>
           <AppNavigator />
-        </AuthProvider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+        </SettingsProvider>
+      </AuthProvider>
+    </SafeAreaProvider>
   );
-}
+};
+
+export default App;

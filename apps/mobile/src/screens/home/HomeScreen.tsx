@@ -1,96 +1,126 @@
-import React, { useState } from 'react';
-import {
-  FlatList,
-  Image,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import React, { useEffect, useState } from 'react';
+import { FlatList, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { getProductCategories } from '../../api/product';
+import NavigationBar from '../../components/common/NavigationBar';
+import SearchBar from '../../components/common/SearchBar';
+import CategoryItem from '../../components/product/CategoryItem';
 
-const HomeScreen: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+}
+
+interface HomeScreenProps {
+  navigation: any;
+}
+
+const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getProductCategories();
+        setCategories(data);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const handleSearch = (query: string) => {
+    navigation.navigate('ProductListing', { search: query });
+  };
+
+  const handleCategoryPress = (category: Category) => {
+    navigation.navigate('ProductListing', { category: category.name });
+  };
+
+  const handleNavigate = (route: 'home' | 'settings' | 'profile') => {
+    if (route === 'home') {
+      navigation.navigate('Home');
+      return;
+    }
+
+    if (route === 'settings') {
+      navigation.navigate('Settings');
+      return;
+    }
+
+    if (route === 'profile') {
+      navigation.navigate('Profile');
+      return;
+    }
+
+    return;
+  };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Input here"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-        <TouchableOpacity style={styles.searchButton}>
-          <Ionicons name="search" size={24} color="#333" />
-        </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Landing Page</Text>
       </View>
 
-      <Text style={styles.sectionTitle}>Product Categories</Text>
-    </View>
+      <SearchBar onSearch={handleSearch} />
+
+      <View style={styles.content}>
+        {isLoading ? (
+          <Text style={styles.loadingText}>Loading categories...</Text>
+        ) : (
+          <FlatList
+            data={categories}
+            renderItem={({ item }) => (
+              <CategoryItem
+                name={item.name}
+                icon={item.icon}
+                onPress={() => handleCategoryPress(item)}
+              />
+            )}
+            keyExtractor={(item, index) => `${item.id}-${index}`}
+            numColumns={3}
+            contentContainerStyle={styles.categoriesContainer}
+          />
+        )}
+      </View>
+
+      <NavigationBar activeRoute="home" onNavigate={handleNavigate} />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
-    paddingTop: 10,
+    backgroundColor: '#ffe6cc',
   },
-  searchContainer: {
-    flexDirection: 'row',
-    margin: 10,
-    backgroundColor: 'white',
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  searchInput: {
-    flex: 1,
-    height: 46,
-    paddingHorizontal: 15,
-  },
-  searchButton: {
-    padding: 10,
-    justifyContent: 'center',
+  header: {
+    backgroundColor: '#c8e6c9',
+    padding: 15,
     alignItems: 'center',
   },
-  sectionTitle: {
+  headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginVertical: 15,
-    marginHorizontal: 15,
+  },
+  content: {
+    flex: 1,
+    backgroundColor: '#fff',
+    margin: 10,
+    borderColor: '#000',
+    borderWidth: 1,
   },
   categoriesContainer: {
-    padding: 10,
+    padding: 12,
   },
-  categoryItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    margin: 5,
-    padding: 15,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  categoryIcon: {
-    width: 50,
-    height: 50,
-    marginBottom: 10,
-  },
-  categoryName: {
-    fontSize: 12,
+  loadingText: {
     textAlign: 'center',
+    marginTop: 20,
   },
 });
 

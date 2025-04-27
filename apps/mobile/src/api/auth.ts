@@ -1,10 +1,7 @@
-import { apiAuthClient } from './axios-config';
+import { API_AUTH_BASE_URL } from '@env';
+import axios from 'axios';
+import { LoginCredentials } from '../types';
 
-export type LoginCredentials = {
-  username: string;
-  password: string;
-};
-
-export const login = (credentials: LoginCredentials) => {
-  return apiAuthClient.post('/auth/login', credentials);
+export const login = async (credentials: LoginCredentials) => {
+  return axios.post(`${API_AUTH_BASE_URL}/auth/login`, credentials);
 };

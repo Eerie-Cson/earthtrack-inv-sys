@@ -1,95 +1,103 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { login as apiLogin } from '../api/auth';
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import { login } from '../api/auth';
 
-type User = {
+interface User {
   id: string;
   username: string;
   role: string;
   email: string;
   firstname: string;
   lastname: string;
-};
+}
 
-type AuthContextType = {
-  isAuthenticated: boolean;
+interface AuthContextType {
   user: User | null;
+  token: string | null;
+  isLoading: boolean;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  isLoading: boolean;
-  error: string | null;
-};
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadStoredAuth = async () => {
+    const loadUserData = async () => {
       try {
-        const token = await AsyncStorage.getItem('auth_token');
+        const storedToken = await AsyncStorage.getItem('token');
         const storedUser = await AsyncStorage.getItem('user');
 
-        if (token && storedUser) {
+        if (storedToken && storedUser) {
+          setToken(storedToken);
           setUser(JSON.parse(storedUser));
-          setIsAuthenticated(true);
         }
-      } catch (err) {
-        console.error('Failed to load auth info:', err);
+      } catch (error) {
+        console.error('Failed to load authentication data:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadStoredAuth();
+    loadUserData();
   }, []);
 
-  const login = async (username: string, password: string) => {
+  const handleLogin = async (username: string, password: string) => {
     setIsLoading(true);
-    setError(null);
-
     try {
-      const response = await apiLogin({ username, password });
-
+      const response = await login({ username, password });
       const { access_token, user } = response.data;
 
-      await AsyncStorage.setItem('auth_token', access_token);
+      await AsyncStorage.setItem('token', access_token);
       await AsyncStorage.setItem('user', JSON.stringify(user));
 
+      setToken(access_token);
       setUser(user);
-      setIsAuthenticated(true);
-    } catch (err) {
-      setError('Invalid username or password');
-      console.error('Login failed:', err);
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = async () => {
+  const handleLogout = async () => {
     setIsLoading(true);
     try {
-      await AsyncStorage.removeItem('auth_token');
+      await AsyncStorage.removeItem('token');
       await AsyncStorage.removeItem('user');
-      setIsAuthenticated(false);
+
+      setToken(null);
       setUser(null);
-    } catch (err) {
-      console.error('Logout failed:', err);
+    } catch (error) {
+      console.error('Logout error:', error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const authContextValue: AuthContextType = {
+    user,
+    token,
+    isLoading,
+    login: handleLogin,
+    logout: handleLogout,
   };
 
   return (
-    <AuthContext.Provider
-      value={{ isAuthenticated, user, login, logout, isLoading, error }}
-    >
+    <AuthContext.Provider value={authContextValue}>
       {children}
     </AuthContext.Provider>
   );

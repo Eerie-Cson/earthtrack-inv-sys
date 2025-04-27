@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ObjectId } from '@lib/object-id';
 import { paginate, PaginatedResponse, PaginateOptions } from '@lib/paginate';
-import { Logger } from '@nestjs/common'; // Added Logger import
+import { Logger } from '@nestjs/common';
 import { Binary } from 'mongodb';
 import { Connection, FilterQuery, Model, Schema } from 'mongoose';
 import * as R from 'ramda';
@@ -67,7 +67,7 @@ export class MongooseRepository<TEntity extends { id: ObjectId }>
   implements Repository<TEntity>
 {
   private readonly _model: Model<TEntity>;
-  private readonly logger: Logger; // Added Logger instance
+  private readonly logger: Logger;
 
   constructor(connection: Connection, name: string, schema: Schema) {
     this._model = connection.model<TEntity>(name, schema);

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -9,16 +10,28 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 const LoginScreen: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const { login, isLoading, error } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login } = useAuth();
 
   const handleLogin = async () => {
-    if (username.trim() && password.trim()) {
+    if (!username.trim() || !password.trim()) {
+      Alert.alert('Error', 'Username and password are required');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
       await login(username, password);
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Login Failed', 'Invalid username or password');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -26,15 +39,17 @@ const LoginScreen: React.FC = () => {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={100}
     >
       <View style={styles.formContainer}>
         <Text style={styles.title}>Earthtrack Inventory Management</Text>
-        <Text style={styles.subtitle}>Login to continue</Text>
+        <Text style={styles.subtitle}>Login to your account</Text>
 
         <View style={styles.inputContainer}>
+          <Text style={styles.label}>Username</Text>
           <TextInput
             style={styles.input}
-            placeholder="Username"
+            placeholder="Enter your username"
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
@@ -42,23 +57,22 @@ const LoginScreen: React.FC = () => {
         </View>
 
         <View style={styles.inputContainer}>
+          <Text style={styles.label}>Password</Text>
           <TextInput
             style={styles.input}
-            placeholder="Password"
+            placeholder="Enter your password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
           />
         </View>
 
-        {error && <Text style={styles.errorText}>{error}</Text>}
-
         <TouchableOpacity
           style={styles.loginButton}
           onPress={handleLogin}
-          disabled={isLoading}
+          disabled={isSubmitting}
         >
-          {isLoading ? (
+          {isSubmitting ? (
             <ActivityIndicator color="#fff" />
           ) : (
             <Text style={styles.loginButtonText}>Login</Text>
@@ -80,47 +94,45 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
     color: '#666',
-    marginBottom: 30,
+    marginBottom: 32,
     textAlign: 'center',
   },
   inputContainer: {
-    backgroundColor: 'white',
-    borderRadius: 5,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 14,
+    marginBottom: 8,
+    color: '#333',
   },
   input: {
-    height: 50,
-    paddingHorizontal: 15,
+    height: 48,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#fff',
   },
   loginButton: {
-    backgroundColor: '#d5e8d4',
-    height: 50,
-    borderRadius: 5,
+    backgroundColor: '#007AFF',
+    height: 48,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 24,
   },
   loginButtonText: {
-    color: '#798378',
+    color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
-  },
-  errorText: {
-    color: 'red',
-    marginBottom: 10,
+    fontWeight: '600',
   },
 });
 
