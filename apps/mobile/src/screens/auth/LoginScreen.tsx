@@ -1,4 +1,3 @@
-// src/screens/auth/LoginScreen.tsx
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
@@ -10,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 const LoginScreen: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -29,7 +28,7 @@ const LoginScreen: React.FC = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.formContainer}>
-        <Text style={styles.title}>Inventory Management</Text>
+        <Text style={styles.title}>Earthtrack Inventory Management</Text>
         <Text style={styles.subtitle}>Login to continue</Text>
 
         <View style={styles.inputContainer}>
@@ -107,7 +106,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   loginButton: {
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#d5e8d4',
     height: 50,
     borderRadius: 5,
     justifyContent: 'center',
@@ -115,7 +114,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   loginButtonText: {
-    color: 'white',
+    color: '#798378',
     fontSize: 16,
     fontWeight: 'bold',
   },

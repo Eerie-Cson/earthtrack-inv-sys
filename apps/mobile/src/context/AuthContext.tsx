@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.tsx
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { login as apiLogin } from '../api/auth';
@@ -58,7 +57,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const response = await apiLogin({ username, password });
 
-      console.log('Login response:', response.data);
       const { access_token, user } = response.data;
 
       await AsyncStorage.setItem('auth_token', access_token);
