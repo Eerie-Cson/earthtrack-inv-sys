@@ -15,6 +15,7 @@ async function bootstrap() {
     })
   );
   app.setGlobalPrefix(globalPrefix);
+  app.enableCors();
 
   const config = new DocumentBuilder()
     .setTitle('Product Service')
@@ -26,7 +27,7 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, doc);
 
   const port = process.env.PRODUCT_PORT || 3000;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   Logger.log(
     `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
   );
