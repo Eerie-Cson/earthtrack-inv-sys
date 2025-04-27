@@ -20,7 +20,7 @@ module.exports = {
       compiler: 'babel',
       main: './src/main-web.tsx',
       index: './src/index.html',
-      outputPath: 'dist/mobile',
+      outputPath: 'dist/apps/mobile',
       baseHref: '/',
       assets: ['./src/favicon.ico', './src/assets'],
       styles: [],

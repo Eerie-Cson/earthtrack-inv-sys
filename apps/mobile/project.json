@@ -3,29 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/mobile/src",
   "projectType": "application",
-  "targets": {
-    "run-ios": {
-      "executor": "@nx/react-native:run-ios",
-      "options": {
-        "port": 8081,
-        "resetCache": false
-      }
-    },
-    "run-android": {
-      "executor": "@nx/react-native:run-android",
-      "options": {
-        "port": 8081,
-        "resetCache": false
-      }
-    },
-    "bundle": {
-      "executor": "@nx/react-native:bundle",
-      "outputs": ["{options.bundleOutput}"],
-      "options": {
-        "entryFile": "apps/mobile/src/main.tsx",
-        "platform": "ios",
-        "bundleOutput": "dist/apps/mobile/ios/main.jsbundle"
-      }
-    }
-  }
+  "tags": [],
+  "// targets": "to see all targets run: nx show project mobile --web",
+  "targets": {}
 }
