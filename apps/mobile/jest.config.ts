@@ -6,7 +6,13 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   moduleNameMapper: {
     '\\.svg$': '@nx/react-native/plugins/jest/svg-mock',
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!((jest-)?react-native' +
+      '|@react-native(-community)?' +
+      '|@react-navigation|react-native-vector-icons|react-native-gesture-handler)/)',
+  ],
   transform: {
     '^.+.(js|ts|tsx)$': [
       'babel-jest',
