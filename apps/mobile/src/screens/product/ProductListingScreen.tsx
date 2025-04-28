@@ -1,4 +1,3 @@
-import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -9,11 +8,11 @@ import {
   View,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { getProducts } from '../../api/product';
 import SearchBar from '../../components/common/SearchBar';
 import ProductItem from '../../components/product/ProductItem';
-import { useSettings } from '../../contexts/SettingsContext';
-import { Category, Product } from '../../types';
+import { useProductListing } from '../../hooks/product/useProduct';
+import { Category } from '../../types';
+import Pagination from './Pagination';
 
 interface ProductListingScreenProps {
   route: {
@@ -25,134 +24,20 @@ interface ProductListingScreenProps {
   navigation: any;
 }
 
-//TODO Separate Business logic and ui
-
 const ProductListingScreen: React.FC<ProductListingScreenProps> = ({
   route,
   navigation,
 }) => {
-  const { search, category } = route.params || {};
-  const { recordsPerPage } = useSettings();
-
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageCursors, setPageCursors] = useState<{
-    [key: number]: string | undefined;
-  }>({ 1: undefined });
-  const [totalPages, setTotalPages] = useState(1);
-  const [searchQuery, setSearchQuery] = useState(search || '');
-
-  const fetchProducts = useCallback(
-    async (page: number, newSearch?: string, newCategory?: Category) => {
-      setIsLoading(true);
-      try {
-        const params = {
-          limit: recordsPerPage,
-          cursor: pageCursors[page],
-          sort: 'desc' as 'asc' | 'desc',
-          ...(newSearch && { name: newSearch }),
-          ...(newCategory && { category: newCategory }),
-        };
-
-        const response = await getProducts(params);
-        const newProducts = response.data.data || [];
-        const nextCursor = response.data.nextCursor;
-
-        setProducts(newProducts);
-
-        if (nextCursor && !pageCursors[page + 1]) {
-          setPageCursors((prev) => ({ ...prev, [page + 1]: nextCursor }));
-          setTotalPages((prev) =>
-            nextCursor ? Math.max(prev, page + 1) : prev
-          );
-        }
-
-        setCurrentPage(page);
-      } catch (error) {
-        console.error('Failed to fetch products:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [recordsPerPage, pageCursors]
-  );
-
-  useEffect(() => {
-    fetchProducts(1, search, category);
-  }, [search, category, recordsPerPage]);
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setPageCursors({ 1: undefined });
-    setTotalPages(1);
-    fetchProducts(1, query, category);
-  };
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages && page !== currentPage) {
-      fetchProducts(page, searchQuery, category);
-    }
-  };
-
-  const renderPageNumbers = useCallback(() => {
-    const pages = [];
-    let startPage = Math.max(1, currentPage - 1);
-    let endPage = Math.min(totalPages, currentPage + 1);
-
-    if (currentPage === 1) {
-      endPage = Math.min(3, totalPages);
-    } else if (currentPage === totalPages) {
-      startPage = Math.max(1, totalPages - 2);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(
-        <TouchableOpacity
-          key={i}
-          style={[styles.pageNumber, currentPage === i && styles.activePage]}
-          onPress={() => handlePageChange(i)}
-        >
-          <Text
-            style={currentPage === i ? styles.activePageText : styles.pageText}
-          >
-            {i}
-          </Text>
-        </TouchableOpacity>
-      );
-    }
-
-    return (
-      <View style={styles.paginationContainer}>
-        <TouchableOpacity
-          style={[
-            styles.arrowButton,
-            currentPage === 1 && styles.disabledButton,
-          ]}
-          onPress={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          <Text style={styles.arrowText}>&lt;</Text>
-        </TouchableOpacity>
-
-        {pages}
-
-        <TouchableOpacity
-          style={[
-            styles.arrowButton,
-            currentPage === totalPages && styles.disabledButton,
-          ]}
-          onPress={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          <Text style={styles.arrowText}>&gt;</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }, [currentPage, totalPages]);
-  const handleGoBack = () => {
-    navigation.goBack();
-  };
+  const {
+    products,
+    isLoading,
+    currentPage,
+    totalPages,
+    searchQuery,
+    handleSearch,
+    handlePageChange,
+    handleGoBack,
+  } = useProductListing(route.params || {}, navigation);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -192,7 +77,15 @@ const ProductListingScreen: React.FC<ProductListingScreenProps> = ({
                   <Text style={styles.emptyText}>No products found</Text>
                 }
               />
-              <View>{renderPageNumbers()}</View>
+              <View>
+                {
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    handlePageChange={handlePageChange}
+                  />
+                }
+              </View>
             </View>
           </>
         )}
