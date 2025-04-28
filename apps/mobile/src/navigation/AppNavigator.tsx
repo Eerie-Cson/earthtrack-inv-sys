@@ -2,7 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { StatusBar } from 'react-native';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthContext } from '../contexts/AuthContext';
 
 import LoginScreen from '../screens/auth/LoginScreen';
 import HomeScreen from '../screens/home/HomeScreen';
@@ -13,7 +13,7 @@ import SettingsScreen from '../screens/settings/SettingsScreen';
 const Stack = createStackNavigator();
 
 const AppNavigator: React.FC = () => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading } = useAuthContext();
 
   if (isLoading) {
     return null;
