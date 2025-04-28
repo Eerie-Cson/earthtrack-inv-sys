@@ -21,6 +21,12 @@ export interface AuthState {
   error: string | null;
 }
 
+export interface CategoryData {
+  id: string;
+  name: string;
+  icon: string;
+}
+
 export enum Category {
   TOOLBOX = 'TOOLBOX',
   BEVERAGES = 'BEVERAGES',
