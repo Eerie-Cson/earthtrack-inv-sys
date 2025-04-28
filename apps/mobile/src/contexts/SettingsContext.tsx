@@ -67,7 +67,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
-export const useSettings = () => {
+export const useSettingsContext = () => {
   const context = useContext(SettingsContext);
   if (context === undefined) {
     throw new Error('useSettings must be used within a SettingsProvider');
