@@ -4,18 +4,12 @@ import { act, renderHook } from '@testing-library/react-hooks';
 import { AxiosHeaders, AxiosResponse } from 'axios';
 import * as AuthApi from '../../api/auth';
 import { AuthProvider, useAuthContext } from '../../contexts/AuthContext';
+import { generateUser } from '../generateData';
 
 describe('AuthContext', () => {
   const token = faker.internet.jwt();
 
-  const mockUser = {
-    id: 'acc_01c3a51ab784c620d6decec2acf06979',
-    username: faker.internet.displayName(),
-    role: 'admin',
-    email: faker.internet.email(),
-    firstname: faker.person.firstName(),
-    lastname: faker.person.lastName(),
-  };
+  const mockUser = generateUser();
 
   const mockAxiosResponse: AxiosResponse = {
     data: {

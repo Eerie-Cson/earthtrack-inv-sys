@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react-hooks';
 import { Alert } from 'react-native';
 import * as AuthContext from '../../contexts/AuthContext';
 import { useAuthActions } from '../../hooks/auth/useAuthActions';
+import { generateCredentials } from '../generateData';
 
 describe('useAuthActions', () => {
   const mockLogin = jest.fn();
@@ -21,16 +22,20 @@ describe('useAuthActions', () => {
   describe('handleLogin', () => {
     test('calls login when handleLogin is invoked with valid credentials', async () => {
       const { result } = renderHook(() => useAuthActions());
+      const userCredentials = generateCredentials();
 
       act(() => {
-        result.current.setUsername('testuser');
-        result.current.setPassword('password123');
+        result.current.setUsername(userCredentials.username);
+        result.current.setPassword(userCredentials.password);
       });
 
       await act(async () => {
         await result.current.handleLogin();
       });
-      expect(mockLogin).toHaveBeenCalledWith('testuser', 'password123');
+      expect(mockLogin).toHaveBeenCalledWith(
+        userCredentials.username,
+        userCredentials.password
+      );
       expect(mockLogin).toHaveBeenCalledTimes(1);
     });
 

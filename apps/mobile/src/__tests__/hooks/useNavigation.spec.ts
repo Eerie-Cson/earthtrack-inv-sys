@@ -68,7 +68,7 @@ describe('useNavigationHandlers', () => {
 
   describe('handleCategoryPress', () => {
     test('navigates to ProductListing with category', () => {
-      const category = { id: '1', name: 'Electronics', icon: 'icon.png' };
+      const category = { id: 'TOOLBOX', name: 'ToolBox', icon: 'toolbox' };
       const { result } = renderHook(() =>
         useNavigationHandlers(mockNavigation)
       );
@@ -78,7 +78,7 @@ describe('useNavigationHandlers', () => {
       });
 
       expect(mockNavigate).toHaveBeenCalledWith('ProductListing', {
-        category: 'Electronics',
+        category: 'ToolBox',
       });
     });
   });

@@ -1,7 +1,9 @@
+import { faker } from '@faker-js/faker';
 import { act, renderHook } from '@testing-library/react-hooks';
 import * as ProductAPI from '../../api/product';
 import * as SettingsContext from '../../contexts/SettingsContext';
 import { useProductListing } from '../../hooks/product/useProduct';
+import { generateProduct } from '../generateData';
 describe('useProductListing', () => {
   const mockNavigation = { goBack: jest.fn() };
   const mockGetProducts = jest.fn();
@@ -9,6 +11,7 @@ describe('useProductListing', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
+    jest.spyOn(console, 'error').mockImplementation(jest.fn());
     jest.spyOn(ProductAPI, 'getProducts').mockImplementation(mockGetProducts);
 
     jest.spyOn(SettingsContext, 'useSettingsContext').mockReturnValue({
@@ -20,10 +23,11 @@ describe('useProductListing', () => {
 
   describe('initial fetch', () => {
     test('fetches products on mount with no route params', async () => {
+      const product = generateProduct();
       const mockData = {
         data: {
-          data: [{ id: '1', name: 'Product 1' }],
-          nextCursor: 'cursor2',
+          data: [product],
+          nextCursor: faker.string.hexadecimal(),
         },
       };
 
@@ -52,16 +56,18 @@ describe('useProductListing', () => {
 
   describe('handleSearch', () => {
     test('updates products and search query on handleSearch', async () => {
+      const initialProduct = generateProduct();
+      const searchProduct = generateProduct();
       const initialData = {
         data: {
-          data: [{ id: '1', name: 'Initial Product' }],
+          data: [initialProduct],
           nextCursor: 'cursor2',
         },
       };
 
       const searchData = {
         data: {
-          data: [{ id: '2', name: 'Search Result' }],
+          data: [searchProduct],
           nextCursor: undefined,
         },
       };
@@ -77,7 +83,7 @@ describe('useProductListing', () => {
       await waitForNextUpdate();
 
       act(() => {
-        result.current.handleSearch('Shoe');
+        result.current.handleSearch('ToolBox');
       });
 
       await waitForNextUpdate();
@@ -85,26 +91,28 @@ describe('useProductListing', () => {
         limit: 10,
         cursor: undefined,
         sort: 'desc',
-        name: 'Shoe',
+        name: 'ToolBox',
       });
 
       expect(result.current.products).toEqual(searchData.data.data);
-      expect(result.current.searchQuery).toBe('Shoe');
+      expect(result.current.searchQuery).toBe('ToolBox');
     });
   });
 
   describe('handlePageChange', () => {
     test('fetches next page of products if within bounds', async () => {
+      const firstPageProduct = generateProduct();
+      const secondPageProduct = generateProduct();
       const page1 = {
         data: {
-          data: [{ id: '1', name: 'Product 1' }],
+          data: [firstPageProduct],
           nextCursor: 'cursor2',
         },
       };
 
       const page2 = {
         data: {
-          data: [{ id: '2', name: 'Product 2' }],
+          data: [secondPageProduct],
           nextCursor: undefined,
         },
       };
@@ -136,7 +144,7 @@ describe('useProductListing', () => {
     test('does not fetch if page is out of bounds', async () => {
       const mockData = {
         data: {
-          data: [{ id: '1', name: 'Only Page' }],
+          data: [generateProduct()],
           nextCursor: undefined,
         },
       };

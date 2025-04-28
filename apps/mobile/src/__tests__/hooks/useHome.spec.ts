@@ -14,8 +14,9 @@ describe('useHome', () => {
 
   test('fetches categories on mount and sets them', async () => {
     const mockCategories = [
-      { id: '1', name: 'Shoes', icon: 'shoe-icon' },
-      { id: '2', name: 'Hats', icon: 'hat-icon' },
+      { id: 'TOOLBOX', name: 'ToolBox', icon: 'toolbox' },
+      { id: 'BEVERAGES', name: 'Beverages', icon: 'beverages' },
+      { id: 'ACCESSORIES', name: 'Accessories', icon: 'accessories' },
     ];
 
     mockGetProductCategories.mockResolvedValueOnce(mockCategories);
