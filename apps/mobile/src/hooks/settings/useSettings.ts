@@ -34,7 +34,6 @@ export const useSettings = () => {
 
   const handleSave = async () => {
     if (validateInput(value)) {
-      console.log('value', value);
       try {
         await setRecordsPerPage(parseInt(value, 10));
         Alert.alert('Success', 'Settings saved successfully');
