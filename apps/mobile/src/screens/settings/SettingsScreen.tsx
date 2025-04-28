@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -13,70 +12,16 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NavigationBar from '../../components/common/NavigationBar';
 import SearchBar from '../../components/common/SearchBar';
-import { useSettings } from '../../contexts/SettingsContext';
+import { useNavigationHandlers } from '../../hooks/navigation/useAppNavigation';
+import { useSettings } from '../../hooks/settings/useSettings';
 
 interface SettingsScreenProps {
   navigation: any;
 }
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
-  const { recordsPerPage, setRecordsPerPage } = useSettings();
-  const [value, setValue] = useState(recordsPerPage.toString());
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSearch = (query: string) => {
-    navigation.navigate('ProductListing', { search: query });
-  };
-
-  const handleNavigate = (route: 'home' | 'settings' | 'profile') => {
-    switch (route) {
-      case 'home':
-        navigation.navigate('Home');
-        break;
-      case 'settings':
-        break;
-      case 'profile':
-        navigation.navigate('Profile');
-        break;
-    }
-  };
-
-  const validateInput = (input: string): boolean => {
-    if (!input.trim()) {
-      setError('Records per page cannot be empty');
-      return false;
-    }
-
-    const number = parseInt(input, 10);
-    if (isNaN(number)) {
-      setError('Please enter a valid number');
-      return false;
-    }
-
-    if (number <= 0) {
-      setError('Please enter a positive number');
-      return false;
-    }
-
-    if (number > 100) {
-      setError('Value cannot exceed 100');
-      return false;
-    }
-
-    setError(null);
-    return true;
-  };
-
-  const handleSave = async () => {
-    if (validateInput(value)) {
-      try {
-        await setRecordsPerPage(parseInt(value, 10));
-        Alert.alert('Success', 'Settings saved successfully');
-      } catch (error) {
-        Alert.alert('Error', 'Failed to save settings');
-      }
-    }
-  };
+  const { error, setValue, handleSave, value, validateInput } = useSettings();
+  const { handleSearch, handleNavigate } = useNavigationHandlers(navigation);
 
   return (
     <SafeAreaView style={styles.container}>
