@@ -18,5 +18,6 @@ module.exports = {
       'react-native/jest/assetFileTransformer.js'
     ),
   },
+  testPathIgnorePatterns: ['/__mocks__/', 'generateData.ts'],
   coverageDirectory: '../../coverage/apps/mobile',
 };
