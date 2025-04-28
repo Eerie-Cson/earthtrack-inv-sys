@@ -1,65 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { FlatList, SafeAreaView, StyleSheet, Text, View } from 'react-native';
-import { getProductCategories } from '../../api/product';
 import NavigationBar from '../../components/common/NavigationBar';
 import SearchBar from '../../components/common/SearchBar';
 import CategoryItem from '../../components/product/CategoryItem';
-
-interface Category {
-  id: string;
-  name: string;
-  icon: string;
-}
+import { useHome } from '../../hooks/home/useHome';
+import { useNavigationHandlers } from '../../hooks/navigation/useAppNavigation';
 
 interface HomeScreenProps {
   navigation: any;
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { categories, isLoading } = useHome();
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await getProductCategories();
-        setCategories(data);
-      } catch (error) {
-        console.error('Failed to fetch categories:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
-  const handleSearch = (query: string) => {
-    navigation.navigate('ProductListing', { search: query });
-  };
-
-  const handleCategoryPress = (category: Category) => {
-    navigation.navigate('ProductListing', { category: category.name });
-  };
-
-  const handleNavigate = (route: 'home' | 'settings' | 'profile') => {
-    if (route === 'home') {
-      navigation.navigate('Home');
-      return;
-    }
-
-    if (route === 'settings') {
-      navigation.navigate('Settings');
-      return;
-    }
-
-    if (route === 'profile') {
-      navigation.navigate('Profile');
-      return;
-    }
-
-    return;
-  };
+  const { handleSearch, handleCategoryPress, handleNavigate } =
+    useNavigationHandlers(navigation);
 
   return (
     <SafeAreaView style={styles.container}>
