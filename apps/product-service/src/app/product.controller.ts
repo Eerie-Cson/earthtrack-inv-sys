@@ -60,6 +60,7 @@ export class ProductController {
       filter: {
         name: params.name,
         description: params.description,
+        category: params.category,
       },
     });
   }

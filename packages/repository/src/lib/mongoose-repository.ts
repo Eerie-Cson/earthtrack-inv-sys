@@ -132,7 +132,9 @@ export class MongooseRepository<TEntity extends { id: ObjectId }>
     options: PaginateOptions<TEntity>
   ): Promise<PaginatedResponse<TEntity>> {
     this.logger.log(
-      `Paginating list (filter ${filter}, limit ${options.limit})`
+      `Paginating list (filter ${JSON.stringify(filter)}, cursor ${
+        options.cursor
+      }, sort ${options.sort}, filter ${filter}, limit ${options.limit})`
     );
 
     const result = await paginate(

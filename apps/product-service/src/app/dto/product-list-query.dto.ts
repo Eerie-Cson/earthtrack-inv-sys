@@ -1,6 +1,7 @@
 import { Category } from '@lib/types';
 import { Type } from 'class-transformer';
 import {
+  IsEnum,
   IsIn,
   IsNumber,
   IsOptional,
@@ -32,4 +33,8 @@ export class ProductListQueryDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @IsOptional()
+  @IsEnum(Category)
+  category?: Category;
 }

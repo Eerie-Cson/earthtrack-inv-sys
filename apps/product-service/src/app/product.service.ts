@@ -4,6 +4,7 @@ import { Product } from '@lib/types';
 import { normalizeDocument } from '@lib/util';
 import { Inject, Injectable } from '@nestjs/common';
 import { FilterQuery } from 'mongoose';
+import * as R from 'ramda';
 import { ProductNotFoundError } from '../error';
 import { Token } from './libs/tokens';
 import { ProductRepository } from './repository/product.repository';
@@ -58,9 +59,10 @@ export class ProductService {
     filter: {
       name?: string;
       description?: string;
+      category?: string;
     };
   }) {
-    const filter: FilterQuery<Product> = {};
+    const filter: FilterQuery<Product> = R.reject(R.isNil, params.filter);
 
     if (params.filter.name) {
       filter.name = { $regex: params.filter.name, $options: 'i' };
