@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -10,30 +9,18 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuthActions } from '../../hooks/auth/useAuthActions';
 
 const LoginScreen: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const {
+    username,
+    password,
+    isSubmitting,
 
-  const handleLogin = async () => {
-    if (!username.trim() || !password.trim()) {
-      Alert.alert('Error', 'Username and password are required');
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      await login(username, password);
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Login Failed', 'Invalid username or password');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    setUsername,
+    setPassword,
+    handleLogin,
+  } = useAuthActions();
 
   return (
     <KeyboardAvoidingView
