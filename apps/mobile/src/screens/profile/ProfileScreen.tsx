@@ -1,7 +1,6 @@
 import * as R from 'ramda';
 import React from 'react';
 import {
-  Alert,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -11,7 +10,9 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NavigationBar from '../../components/common/NavigationBar';
 import SearchBar from '../../components/common/SearchBar';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuthContext } from '../../contexts/AuthContext';
+import { useAuthActions } from '../../hooks/auth/useAuthActions';
+import { useNavigationHandlers } from '../../hooks/navigation/useAppNavigation';
 
 interface ProfileScreenProps {
   navigation: any;
@@ -24,7 +25,8 @@ const capitalize: (str: string) => string = R.pipe(
 );
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
-  const { user, logout } = useAuth();
+  const { handleLogout } = useAuthActions();
+  const { user } = useAuthContext();
   const profileData = {
     fullName:
       user && user?.firstname && user?.lastname
@@ -34,34 +36,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     username: capitalize(user?.username) || '',
   };
 
-  const handleSearch = (query: string) => {
-    navigation.navigate('ProductListing', { search: query });
-  };
-
-  //TODO make this a reusable library, repeating across screens
-  const handleNavigate = (route: 'home' | 'settings' | 'profile') => {
-    switch (route) {
-      case 'home':
-        navigation.navigate('Home');
-        break;
-      case 'settings':
-        navigation.navigate('Settings');
-        break;
-      case 'profile':
-        break;
-    }
-  };
-
-  const handleLogout = async () => {
-    Alert.alert('Confirm Logout', 'Are you sure you want to log out?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Logout',
-        style: 'destructive',
-        onPress: () => logout(),
-      },
-    ]);
-  };
+  const { handleSearch, handleNavigate } = useNavigationHandlers(navigation);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -95,7 +70,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: '#f5f5f5',
     backgroundColor: '#ffe6cc',
     borderColor: '#ebc166',
   },
