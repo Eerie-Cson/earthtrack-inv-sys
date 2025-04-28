@@ -115,13 +115,13 @@ describe('useProductListing', () => {
         useProductListing({}, mockNavigation)
       );
 
-      await waitForNextUpdate(); // first page
+      await waitForNextUpdate();
 
       act(() => {
         result.current.handlePageChange(2);
       });
 
-      await waitForNextUpdate(); // second page
+      await waitForNextUpdate();
 
       expect(mockGetProducts).toHaveBeenLastCalledWith({
         limit: 10,

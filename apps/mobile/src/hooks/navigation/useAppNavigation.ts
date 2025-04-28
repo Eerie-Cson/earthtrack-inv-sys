@@ -1,4 +1,3 @@
-// src/hooks/useNavigationHandlers.ts
 import { NavigationProp } from '@react-navigation/native';
 import { CategoryData } from '../../types';
 
