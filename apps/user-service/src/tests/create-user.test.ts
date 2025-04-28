@@ -3,6 +3,7 @@ import { generateAccount } from './helpers/generate-account';
 import { setupFixture } from './helpers/setup-fixture';
 
 import * as grpc from '@grpc/grpc-js';
+import { AccountRole } from '@lib/types';
 import { Token } from '../app/libs/token';
 import { UserRepository } from '../app/repository/user.repository';
 
@@ -33,7 +34,7 @@ describe('UserController.CreateUser (gRPC)', () => {
     expect(createdUser).toMatchObject({
       username: user.username,
       email: user.email,
-      role: user.role,
+      role: AccountRole.User,
     });
 
     await teardown();
