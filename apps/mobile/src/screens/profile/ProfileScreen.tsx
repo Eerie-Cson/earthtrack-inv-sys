@@ -33,7 +33,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         ? `${capitalize(user.firstname)} ${capitalize(user.lastname)}`
         : '',
     position: capitalize(user?.role) || '',
-    username: capitalize(user?.username) || '',
+    username: user?.username || '',
   };
 
   const { handleSearch, handleNavigate } = useNavigationHandlers(navigation);
