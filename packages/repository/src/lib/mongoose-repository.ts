@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ObjectId } from '@lib/object-id';
-import { paginate, PaginatedResponse, PaginateOptions } from '@lib/paginate';
+import { paginate, PaginatedResponse, PaginateOptions } from '@lib/pagination';
 import { Logger } from '@nestjs/common';
 import { Binary } from 'mongodb';
 import { Connection, FilterQuery, Model, Schema } from 'mongoose';

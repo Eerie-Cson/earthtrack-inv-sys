@@ -1,5 +1,5 @@
 import { ObjectId } from '@lib/object-id';
-import { PaginateOptions } from '@lib/paginate';
+import { PaginateOptions } from '@lib/pagination';
 import { Product } from '@lib/types';
 import { normalizeDocument } from '@lib/util';
 import { Inject, Injectable } from '@nestjs/common';

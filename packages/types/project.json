@@ -5,5 +5,22 @@
   "projectType": "library",
   "tags": [],
   "// targets": "to see all targets run: nx show project types --web",
-  "targets": {}
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{workspaceRoot}/dist/packages/types"],
+      "options": {
+        "outputPath": "dist/packages/types",
+        "main": "packages/types/src/index.ts",
+        "tsConfig": "packages/types/tsconfig.lib.json"
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "options": {
+        "jestConfig": "packages/types/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  }
 }

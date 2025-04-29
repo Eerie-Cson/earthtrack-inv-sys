@@ -1,5 +1,5 @@
 import { ObjectId } from '@lib/object-id';
-import { PaginateOptions, PaginatedResponse } from '@lib/paginate';
+import { PaginateOptions, PaginatedResponse } from '@lib/pagination';
 import { FilterQuery } from 'mongoose';
 
 export interface Repository<T extends { id: ObjectId }> {
