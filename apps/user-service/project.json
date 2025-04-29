@@ -6,14 +6,27 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
       "options": {
-        "command": "webpack-cli build",
-        "args": ["node-env=production"]
+        "target": "node",
+        "outputPath": "dist/apps/user-service",
+        "main": "apps/user-service/src/main.ts",
+        "tsConfig": "apps/user-service/tsconfig.app.json",
+        "compiler": "tsc",
+        "assets": ["apps/user-service/src/assets"],
+        "webpackConfig": "apps/user-service/webpack.config.js"
       },
       "configurations": {
         "development": {
-          "args": ["node-env=development"]
+          "outputPath": "dist/apps/user-service",
+          "optimization": false,
+          "sourceMap": true
+        },
+        "production": {
+          "outputPath": "dist/apps/user-service",
+          "optimization": true,
+          "sourceMap": false
         }
       }
     },
@@ -37,12 +50,6 @@
     "test": {
       "options": {
         "passWithNoTests": true
-      }
-    },
-    "generate-proto": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx grpc_tools_node_protoc --plugin=protoc-gen-ts_proto=node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=packages/shared/src/generated-types --ts_proto_opt=nestJs=true --proto_path=scripts/proto scripts/proto/user.proto"
       }
     }
   }
