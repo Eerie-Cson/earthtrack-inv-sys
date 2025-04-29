@@ -45,7 +45,6 @@ describe('Product API', () => {
     try {
       await getProductById(generateId('pro'));
     } catch (error: any) {
-      console.log(error.response);
       expect(error.response.status).toBe(404);
       expect(error.response.data).toBeUndefined();
     }

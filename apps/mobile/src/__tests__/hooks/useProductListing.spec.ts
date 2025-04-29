@@ -1,9 +1,10 @@
 import { faker } from '@faker-js/faker';
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook, waitFor } from '@testing-library/react-native';
 import * as ProductAPI from '../../api/product';
 import * as SettingsContext from '../../contexts/SettingsContext';
 import { useProductListing } from '../../hooks/product/useProduct';
 import { generateProduct } from '../generateData';
+
 describe('useProductListing', () => {
   const mockNavigation = { goBack: jest.fn() };
   const mockGetProducts = jest.fn();
@@ -11,7 +12,6 @@ describe('useProductListing', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    jest.spyOn(console, 'error').mockImplementation(jest.fn());
     jest.spyOn(ProductAPI, 'getProducts').mockImplementation(mockGetProducts);
 
     jest.spyOn(SettingsContext, 'useSettingsContext').mockReturnValue({
@@ -33,13 +33,15 @@ describe('useProductListing', () => {
 
       mockGetProducts.mockResolvedValueOnce(mockData);
 
-      const { result, waitForNextUpdate } = renderHook(() =>
+      const { result } = renderHook(() =>
         useProductListing({}, mockNavigation)
       );
 
       expect(result.current.isLoading).toBe(true);
 
-      await waitForNextUpdate();
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
 
       expect(mockGetProducts).toHaveBeenCalledWith({
         limit: 10,
@@ -50,7 +52,6 @@ describe('useProductListing', () => {
       expect(result.current.products).toEqual(mockData.data.data);
       expect(result.current.currentPage).toBe(1);
       expect(result.current.totalPages).toBe(2);
-      expect(result.current.isLoading).toBe(false);
     });
   });
 
@@ -76,17 +77,23 @@ describe('useProductListing', () => {
         .mockResolvedValueOnce(initialData)
         .mockResolvedValueOnce(searchData);
 
-      const { result, waitForNextUpdate } = renderHook(() =>
+      const { result } = renderHook(() =>
         useProductListing({}, mockNavigation)
       );
 
-      await waitForNextUpdate();
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
 
       act(() => {
         result.current.handleSearch('ToolBox');
       });
 
-      await waitForNextUpdate();
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+        expect(result.current.searchQuery).toBe('ToolBox');
+      });
+
       expect(mockGetProducts).toHaveBeenLastCalledWith({
         limit: 10,
         cursor: undefined,
@@ -95,7 +102,6 @@ describe('useProductListing', () => {
       });
 
       expect(result.current.products).toEqual(searchData.data.data);
-      expect(result.current.searchQuery).toBe('ToolBox');
     });
   });
 
@@ -119,17 +125,21 @@ describe('useProductListing', () => {
 
       mockGetProducts.mockResolvedValueOnce(page1).mockResolvedValueOnce(page2);
 
-      const { result, waitForNextUpdate } = renderHook(() =>
+      const { result } = renderHook(() =>
         useProductListing({}, mockNavigation)
       );
 
-      await waitForNextUpdate();
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
 
       act(() => {
         result.current.handlePageChange(2);
       });
 
-      await waitForNextUpdate();
+      await waitFor(() => {
+        expect(result.current.currentPage).toBe(2);
+      });
 
       expect(mockGetProducts).toHaveBeenLastCalledWith({
         limit: 10,
@@ -138,7 +148,6 @@ describe('useProductListing', () => {
       });
 
       expect(result.current.products).toEqual(page2.data.data);
-      expect(result.current.currentPage).toBe(2);
     });
 
     test('does not fetch if page is out of bounds', async () => {
@@ -151,17 +160,19 @@ describe('useProductListing', () => {
 
       mockGetProducts.mockResolvedValueOnce(mockData);
 
-      const { result, waitForNextUpdate } = renderHook(() =>
+      const { result } = renderHook(() =>
         useProductListing({}, mockNavigation)
       );
 
-      await waitForNextUpdate();
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
 
       act(() => {
         result.current.handlePageChange(5);
       });
 
-      expect(mockGetProducts).toHaveBeenCalledTimes(1);
+      expect(mockGetProducts).toHaveBeenCalledTimes(1); // Only initial call
     });
   });
 

@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 import * as SettingsContext from '../../contexts/SettingsContext';
 import { useSettings } from '../../hooks/settings/useSettings';

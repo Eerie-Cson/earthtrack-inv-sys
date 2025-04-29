@@ -1,5 +1,5 @@
 import { NavigationProp } from '@react-navigation/native';
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react-native';
 import { useNavigationHandlers } from '../../hooks/navigation/useAppNavigation';
 
 describe('useNavigationHandlers', () => {

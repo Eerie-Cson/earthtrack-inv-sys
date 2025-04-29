@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook, waitFor } from '@testing-library/react-native';
 import {
   SettingsProvider,
   useSettingsContext,
@@ -23,30 +23,26 @@ describe('SettingsContext', () => {
       return null;
     });
 
-    const { result, waitForNextUpdate } = renderHook(
-      () => useSettingsContext(),
-      {
-        wrapper: SettingsProvider,
-      }
-    );
+    const { result } = renderHook(() => useSettingsContext(), {
+      wrapper: SettingsProvider,
+    });
 
-    await waitForNextUpdate();
-
-    expect(result.current.recordsPerPage).toBe(mockRecordsPerPage);
-    expect(result.current.isLoading).toBe(false);
+    await waitFor(() => {
+      expect(result.current.recordsPerPage).toBe(mockRecordsPerPage);
+      expect(result.current.isLoading).toBe(false);
+    });
   });
 
   test('sets recordsPerPage and stores it', async () => {
     const newRecordsPerPage = 20;
 
-    const { result, waitForNextUpdate } = renderHook(
-      () => useSettingsContext(),
-      {
-        wrapper: SettingsProvider,
-      }
-    );
+    const { result } = renderHook(() => useSettingsContext(), {
+      wrapper: SettingsProvider,
+    });
 
-    await waitForNextUpdate();
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false); // Ensure initial loading state is false
+    });
 
     await act(async () => {
       await result.current.setRecordsPerPage(newRecordsPerPage);
@@ -71,6 +67,8 @@ describe('SettingsContext', () => {
       async () => await result.current.setRecordsPerPage(mockRecordsPerPage)
     );
 
-    expect(result.current.isLoading).toBe(false);
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
   });
 });

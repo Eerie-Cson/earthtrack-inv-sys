@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, waitFor } from '@testing-library/react-native';
 import * as ProductAPI from '../../api/product';
 import { useHome } from '../../hooks/home/useHome';
 
@@ -21,15 +21,16 @@ describe('useHome', () => {
 
     mockGetProductCategories.mockResolvedValueOnce(mockCategories);
 
-    const { result, waitForNextUpdate } = renderHook(() => useHome());
+    const { result } = renderHook(() => useHome());
 
     expect(result.current.isLoading).toBe(true);
 
-    await waitForNextUpdate();
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
 
     expect(mockGetProductCategories).toHaveBeenCalledTimes(1);
     expect(result.current.categories).toEqual(mockCategories);
-    expect(result.current.isLoading).toBe(false);
   });
 
   test('sets isLoading to false if API call fails', async () => {
@@ -39,9 +40,11 @@ describe('useHome', () => {
       .spyOn(console, 'error')
       .mockImplementation(jest.fn);
 
-    const { result, waitForNextUpdate } = renderHook(() => useHome());
+    const { result } = renderHook(() => useHome());
 
-    await waitForNextUpdate();
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
 
     expect(mockGetProductCategories).toHaveBeenCalledTimes(1);
     expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -49,7 +52,6 @@ describe('useHome', () => {
       expect.any(Error)
     );
     expect(result.current.categories).toEqual([]);
-    expect(result.current.isLoading).toBe(false);
 
     consoleErrorSpy.mockRestore();
   });
