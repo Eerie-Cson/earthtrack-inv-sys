@@ -1,4 +1,5 @@
-name: inventory-system
+version: '3.8'
+
 networks:
   mongo:
     driver: bridge
@@ -10,9 +11,79 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=user
       - MONGO_INITDB_ROOT_PASSWORD=pass
     volumes:
-      - type: tmpfs
-        target: /data/db
-        tmpfs:
-          mode: 01777
+      - mongo_data:/data/db
     ports:
       - 27017:27017
+    networks:
+      - mongo
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+        tag: 'db'
+
+  auth-service:
+    build: .
+    ports:
+      - 4040:4040
+    networks:
+      - mongo
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    env_file:
+      - .env
+    command: node service/apps/auth-service/main.js
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+        tag: 'app/auth'
+
+  user-service:
+    build: .
+    ports:
+      - 50051:50051
+    networks:
+      - mongo
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    env_file:
+      - .env
+    command: node service/apps/user-service/main.js
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+        tag: 'app/user'
+
+  product-service:
+    build: .
+    ports:
+      - 4041:4041
+    networks:
+      - mongo
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    env_file:
+      - .env
+    command: node service/apps/product-service/main.js
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+        tag: 'app/product'
+
+volumes:
+  mongo_data:
