@@ -34,7 +34,7 @@ describe('UserController.CreateUser (gRPC)', () => {
     expect(createdUser).toMatchObject({
       username: user.username,
       email: user.email,
-      role: AccountRole.User,
+      role: user.role,
     });
 
     await teardown();
