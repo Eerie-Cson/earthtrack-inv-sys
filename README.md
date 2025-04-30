@@ -178,10 +178,12 @@ The app should launch on the emulator/device.
   {
     "name": "Sample Product",
     "description": "A brief description",
-    "category": "Category1",
+    "category": "ToolBox",
     "price": 9.99
   }
   ```
+  **Accepted Category Types**:
+  `ToolBox, Accessories, Beverages`
 - **Update Product**  
   `PUT /api/products/{id}`  
   **Headers**: `Authorization: Bearer <token>`  
@@ -190,8 +192,8 @@ The app should launch on the emulator/device.
   {
     "name": "Updated Name",
     "description": "Updated description",
-    "category": "Category2",
-    "price": 19.99
+    "category": "Updated Category",
+    "price": Updated Price
   }
   ```
 - **Delete Product**  
@@ -220,9 +222,11 @@ The app should launch on the emulator/device.
        "password": "pass123",
        "email": "user1@example.com",
        "firstname": "First",
-       "lastname": "User"
+       "lastname": "User",
+       "role": "user"
      }
      ```
+   - **Accepted roles**: `user, admin, auditor`
    - **Response** returns user data and a JWT token.
 
 2. **Authenticate**
