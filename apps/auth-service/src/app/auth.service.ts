@@ -16,7 +16,7 @@ export class AuthService {
   }
 
   // FOR FUTURE PURPOSE
-  async register(createUserInput: Omit<User, 'id' | 'role'>) {
+  async register(createUserInput: Omit<User, 'id'>) {
     await firstValueFrom(this.userService.CreateUser(createUserInput));
     return this.login({
       username: createUserInput.username,
