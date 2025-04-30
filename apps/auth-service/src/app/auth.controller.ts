@@ -1,7 +1,6 @@
-import { CreateUserRequest } from '@lib/shared';
+import { CreateUserRequest, Credentials } from '@lib/shared';
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -14,7 +13,7 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() credentials: LoginDto) {
+  async login(@Body() credentials: Credentials) {
     return this.authService.login(credentials);
   }
 }

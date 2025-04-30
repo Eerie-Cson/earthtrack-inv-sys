@@ -2,7 +2,11 @@
   "name": "@earthtrack-inv-sys/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "build-packages": "nx run-many --target=build --projects=object-id,types,auth,pagination,repository,shared,util --parallel=1",
+    "build-services": "nx build auth-service && nx build product-service && nx build user-service",
+    "build": "npm run build-packages && npm run build-services"
+  },
   "private": true,
   "dependencies": {
     "@faker-js/faker": "^9.7.0",
