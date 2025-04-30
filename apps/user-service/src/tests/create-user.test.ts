@@ -17,7 +17,7 @@ describe('UserController.CreateUser (gRPC)', () => {
 
     const response = await new Promise((resolve, reject) => {
       grpcClient.CreateUser(
-        R.omit(['id', 'role'], user),
+        R.omit(['id'], user),
         (err: grpc.ServiceError, res: any) => {
           if (err) reject(err);
           else resolve(res);
