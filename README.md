@@ -1,6 +1,6 @@
 # EarthTrack Inventory System
 
-An inventory management system built with a monorepo architecture (Nx) and microservices. This project demonstrates a production-quality approach for both the backend (Node.js, TypeScript, NestJS) and the mobile frontend (React Native, TypeScript, Hooks).
+An enterprise-grade inventory management system built with a monorepo architecture (Nx) and microservices. This project demonstrates a production-quality approach for both the backend (Node.js, TypeScript, NestJS) and the mobile frontend (React Native, TypeScript, Hooks).
 
 ---
 
@@ -19,9 +19,9 @@ An inventory management system built with a monorepo architecture (Nx) and micro
   - [5. Check Logs (Optional)](#5-check-logs-optional)
 - [Mobile App Setup](#mobile-app-setup)
 - [API Endpoints](#api-endpoints)
-- [Postman Testing Workflow](#postman-testing-workflow)
+- [Testing Mutation Endpoints](#testing-mutation-endpoints)
+- [Testing Paginated Results](#testing-paginated-results)
 - [ObjectId Utility Class](#objectid-utility-class)
-- [License](#license)
 
 ---
 
@@ -101,7 +101,7 @@ Key design patterns:
 ## Prerequisites
 
 - **Node.js** (v16+)
-- **npm** or **yarn**
+- **npm**
 - **Docker & Docker Compose**
 - **Postman** (for API testing)
 - **Android Studio** or **physical device** configured for React Native
@@ -161,43 +161,91 @@ The app should launch on the emulator/device.
 
 ## API Endpoints
 
+> **API Docs**: Both auth-service and product-service offer Swagger documentation at `{baseUrl}/api/docs`. It may not be available currently, so you can use Postman instead.
+
+
+
 ### Auth Service (localhost:4040)
 - `POST /register`
 - `POST /login`
 
 ### Product Service (localhost:4041)
-- `POST /api/products`
-- `PUT /api/products/{id}`
-- `DELETE /api/products/{id}`
-- `GET /api/products/{id}`
-- `GET /api/products?name=...&cursor=...&limit=...`
+- **Create Product**  
+  `POST /api/products`  
+  **Headers**: `Authorization: Bearer <token>`  
+  **Body**:
+  ```json
+  {
+    "name": "Sample Product",
+    "description": "A brief description",
+    "category": "Category1",
+    "price": 9.99
+  }
+  ```
+- **Update Product**  
+  `PUT /api/products/{id}`  
+  **Headers**: `Authorization: Bearer <token>`  
+  **Body**:
+  ```json
+  {
+    "name": "Updated Name",
+    "description": "Updated description",
+    "category": "Category2",
+    "price": 19.99
+  }
+  ```
+- **Delete Product**  
+  `DELETE /api/products/{id}`  
+  **Headers**: `Authorization: Bearer <token>`
+- **Get Product**  
+  `GET /api/products/{id}`  
+  **Headers**: `Authorization: Bearer <token>`
+- **Search Products**  
+  `GET /api/products?name=Sample&cursor=...&limit=20`  
+  **Headers**: `Authorization: Bearer <token>`
 
 ### User Service (gRPC, localhost:50051)
+- `PutUser` RPC at `/user` (gRPC, localhost:50051)
 - `PutUser` RPC at `/user`
 
 ---
 
-## Postman Testing Workflow
+## Testing Mutation Endpoints
 
-1. **Register Users** at `POST http://localhost:4040/register`:
-   ```json
-   {
-     "username": "user1",
-     "password": "pass123",
-     "email": "user1@example.com",
-     "firstname": "First",
-     "lastname": "User"
-   }
-   ```
-   - Repeat to create three users.
-2. **Update Roles** (e.g., via database or user-service gRPC) to assign two users as `Admin` and `Auditor`.
-3. **Authenticate** each user at `POST http://localhost:4040/login` and copy the returned JWT.
-4. **Test Product CRUD** using `http://localhost:4041/api/products`:
-   - `POST` (all roles can create).
-   - `PUT /:id` (only Auditor role).
-   - `DELETE /:id` (only Admin role).
-   - `GET` & `GET?name=` (Authenticated users).
-5. **Use JWT** in `Authorization: Bearer <token>` header for all protected routes.
+1. **Register User** via `POST http://localhost:4040/register`
+   - **Request Body**:
+     ```json
+     {
+       "username": "user1",
+       "password": "pass123",
+       "email": "user1@example.com",
+       "firstname": "First",
+       "lastname": "User"
+     }
+     ```
+   - **Response** returns user data and a JWT token.
+
+2. **Authenticate**
+   - Include the token in the `Authorization: Bearer <token>` header for subsequent requests.
+
+3. **Role Assignment Note**
+   - Updating user roles may not yet be supported. Instead, register a new user already assigned the desired role via the register endpoint.
+
+4. **Test Role-Based Product Actions**:
+   - **Create**: `POST /api/products` (all roles)
+   - **Update**: `PUT /api/products/{id}` (Auditor only)
+   - **Delete**: `DELETE /api/products/{id}` (Admin only)
+
+---
+
+## Testing Paginated Results
+
+1. **Launch Mobile App** on emulator/device.
+2. **Login** using a registered user's credentials.
+3. **Add Products** via backend (Postman or another client).
+4. **Search & Pagination**:
+   - Use the top search bar in-app to query by name/description.
+   - Scroll or navigate pages to see cursor-based pagination in action.
 
 ---
 
