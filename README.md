@@ -1,82 +1,214 @@
-# EarthtrackInvSys
+# EarthTrack Inventory System
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+An enterprise-grade inventory management system built with a monorepo architecture (Nx) and microservices. This project demonstrates a production-quality approach for both the backend (Node.js, TypeScript, NestJS) and the mobile frontend (React Native, TypeScript, Hooks).
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+---
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/nest?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+## Table of Contents
 
-## Finish your remote caching setup
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+  - [1. Clone Repository](#1-clone-repository)
+  - [2. Install Dependencies](#2-install-dependencies)
+  - [3. Build Projects](#3-build-projects)
+  - [4. Start Services](#4-start-services)
+  - [5. Check Logs (Optional)](#5-check-logs-optional)
+- [Mobile App Setup](#mobile-app-setup)
+- [API Endpoints](#api-endpoints)
+- [Postman Testing Workflow](#postman-testing-workflow)
+- [ObjectId Utility Class](#objectid-utility-class)
+- [License](#license)
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/fvyd3ybZjm)
+---
 
+## Overview
 
-## Run tasks
+This repository contains a full-stack inventory management system split into microservices within an Nx monorepo. Services include:
 
-To run the dev server for your app, use:
+- **auth-service**: Handles user registration, login (JWT), and role-based authentication.
+- **user-service**: Manages user profiles and role updates via gRPC.
+- **product-service**: Exposes RESTful endpoints for CRUD operations and efficient search with cursor-based pagination.
 
-```sh
-npx nx serve product-service
+The mobile frontend is a React Native application showcasing asynchronous data fetching, search, pagination, and role-aware UI flows.
+
+---
+
+## Architecture
+
+```
+monorepo (Nx)
+├── services
+│   ├── auth-service      # NestJS REST API
+│   ├── user-service      # NestJS gRPC service
+│   └── product-service   # NestJS REST API
+└── mobile
+    └── inventory-app     # React Native (TypeScript)
 ```
 
-To create a production bundle:
+Key design patterns:
 
-```sh
-npx nx build product-service
+- **Microservices** for separation of concerns and scalability.
+- **Cursor-based pagination** in product-service for performant searches over large datasets.
+- **Lightweight ObjectId class** for type-safe, prefixed IDs (`acc_`, `pro_`) with hex and Base58 support.
+- **Role-based access control** (Admin, Auditor, Authenticated user).
+
+---
+
+## Features
+
+### Backend
+
+- RESTful API built with Node.js, TypeScript, and NestJS.
+- CRUD operations on `Product` entity (name, description, category, price).
+- Search endpoint supporting:
+  - Partial, case-insensitive matching on name/description.
+  - Cursor-based pagination for high performance at scale.
+- Role-based permissions:
+  - **Admin**: Delete products.
+  - **Auditor**: Edit/update products.
+  - **Authenticated users**: View/Search products.
+- Auto-generated API documentation (Swagger).
+- Linting (ESLint) and formatting (Prettier).
+- Unit and integration tests (Jest).
+- Docker Compose setup for all services.
+
+### Mobile App
+
+- React Native (TypeScript) using Hooks.
+- Top search bar visible on all screens.
+- Bottom navigation with Home, Settings, Profile.
+- **Landing Page**: Displays product categories (tap to view list).
+- **Product Listing**: Shows name, description, price, with pagination.
+- **Settings**: Numeric input (positive, ≤100, required) with validation feedback.
+- **Profile**: Placeholder avatar and user details (hardcoded for demo).
+- Ensure compilable on Android emulator or physical device.
+
+---
+
+## Tech Stack
+
+- **Backend**: Node.js, TypeScript, NestJS, MongoDB (or SQL), Docker, Jest, RxJS.
+- **Frontend**: React Native, TypeScript, React Navigation, Axios.
+- **Monorepo**: Nx, ESLint, Prettier.
+- **ID Utility**: Custom `ObjectId` class with hex & Base58 support.
+
+---
+
+## Prerequisites
+
+- **Node.js** (v16+)
+- **npm** or **yarn**
+- **Docker & Docker Compose**
+- **Postman** (for API testing)
+- **Android Studio** or **physical device** configured for React Native
+
+---
+
+## Getting Started
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/Eerie-Cson/earthtrack-inv-sys.git
+cd earthtrack-inv-sys
 ```
 
-To see all available targets to run for a project, run:
-
-```sh
-npx nx show project product-service
+### 2. Install Dependencies
+```bash
+npm install
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+### 3. Build Projects
+```bash
+npm run build
+```
+*(Wait for compilation to finish)*
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
-
-```sh
-npx nx g @nx/nest:app demo
+### 4. Start Services
+```bash
+docker compose up
 ```
 
-To generate a new library, use:
-
-```sh
-npx nx g @nx/node:lib mylib
+### 5. Check Logs (Optional)
+```bash
+docker compose logs -f <service-name>
+# e.g.
+# docker compose logs -f auth-service user-service product-service
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+---
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Mobile App Setup
 
+1. Follow React Native environment setup: https://reactnative.dev/docs/set-up-your-environment
+2. Ensure Android emulator or physical device is connected and running.
+3. In one terminal:
+```bash
+nx run-android mobile
+```
+> *If it fails, rerun until the emulator boots and the app installs.*
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+4. In a second terminal:
+```bash
+nx run mobile:start
+```
+The app should launch on the emulator/device.
 
-## Install Nx Console
+---
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+## API Endpoints
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Auth Service (localhost:4040)
+- `POST /register`
+- `POST /login`
 
-## Useful links
+### Product Service (localhost:4041)
+- `POST /api/products`
+- `PUT /api/products/{id}`
+- `DELETE /api/products/{id}`
+- `GET /api/products/{id}`
+- `GET /api/products?name=...&cursor=...&limit=...`
 
-Learn more:
+### User Service (gRPC, localhost:50051)
+- `PutUser` RPC at `/user`
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/nest?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+---
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Postman Testing Workflow
+
+1. **Register Users** at `POST http://localhost:4040/register`:
+   ```json
+   {
+     "username": "user1",
+     "password": "pass123",
+     "email": "user1@example.com",
+     "firstname": "First",
+     "lastname": "User"
+   }
+   ```
+   - Repeat to create three users.
+2. **Update Roles** (e.g., via database or user-service gRPC) to assign two users as `Admin` and `Auditor`.
+3. **Authenticate** each user at `POST http://localhost:4040/login` and copy the returned JWT.
+4. **Test Product CRUD** using `http://localhost:4041/api/products`:
+   - `POST` (all roles can create).
+   - `PUT /:id` (only Auditor role).
+   - `DELETE /:id` (only Admin role).
+   - `GET` & `GET?name=` (Authenticated users).
+5. **Use JWT** in `Authorization: Bearer <token>` header for all protected routes.
+
+---
+
+## ObjectId Utility Class
+
+A lightweight, type-safe identifier generator:
+
+- **Prefixes**: `acc_` for accounts, `pro_` for products.
+- **Encodings**: Hexadecimal and Base58 (bs58) for safe transport.
+- **Reconstruction**: Parse back into `ObjectId` instances from any string form.
+- **Integration**: Works seamlessly with cursor-based pagination for large datasets.
+
+---
+
