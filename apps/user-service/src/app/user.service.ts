@@ -1,5 +1,4 @@
-import { status } from '@grpc/grpc-js';
-import { User } from '@lib/types';
+import { AccountRole, User } from '@lib/types';
 import { normalizeDocument } from '@lib/util';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import bcrypt from 'bcrypt';
@@ -23,8 +22,15 @@ export class UserService {
     private readonly userRepository: UserRepository
   ) {}
 
-  async createUser(input: User): Promise<void> {
+  async createUser(
+    input: Omit<User, 'role'> & { role: string }
+  ): Promise<void> {
     try {
+      if (!Object.values(AccountRole).includes(input.role as AccountRole))
+        throw new UserCreationError('Invalid role type', input.username);
+
+      const role = input.role as AccountRole;
+
       const existingUser = await this.userRepository.find({
         username: input.username,
       });
@@ -40,6 +46,7 @@ export class UserService {
       const hashedPassword = await bcrypt.hash(input.password, 10);
       await this.userRepository.create({
         ...input,
+        role,
         password: hashedPassword,
       });
     } catch (error) {

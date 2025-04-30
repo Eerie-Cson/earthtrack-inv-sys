@@ -75,49 +75,78 @@ export class MongooseRepository<TEntity extends { id: ObjectId }>
   }
 
   public async create(data: TEntity) {
-    const doc = { ...data, _id: data.id.toBuffer() };
-    await this._model.create(doc);
-    this.logger.log(`Document created with ID: ${data.id.toString()}`);
+    this.logger.verbose(`Action: create`);
+    try {
+      const doc = { ...data, _id: data.id.toBuffer() };
+      await this._model.create(doc);
+      this.logger.log(`Params: ${JSON.stringify(data)}`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to create document with filter: ${JSON.stringify(data)}`,
+        error
+      );
+      throw error;
+    }
   }
 
   public async update(filter: FilterQuery<TEntity>, data: Partial<TEntity>) {
-    const filterContext =
-      filter instanceof ObjectId ? `ID: ${filter.toString()}` : 'custom filter';
-    this.logger.log(`Updating documents (${filterContext})`);
+    this.logger.verbose(`Action: update`);
 
-    const result = await this._model.updateMany(normalizeFilter(filter), {
-      $set: {
-        ...serializeDeep(data),
-        dateTimeLastUpdated: new Date(),
-      },
-    });
-
-    this.logger.log(
-      `Update affected ${result.matchedCount} documents, modified ${result.modifiedCount}`
-    );
+    try {
+      await this._model.updateMany(normalizeFilter(filter), {
+        $set: {
+          ...serializeDeep(data),
+          dateTimeLastUpdated: new Date(),
+        },
+      });
+      this.logger.log(`Params: ${JSON.stringify({ filter, data })}`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to update document with filter: ${JSON.stringify({
+          filter,
+          data,
+        })}`,
+        error
+      );
+      throw error;
+    }
   }
 
   public async delete(filter: FilterQuery<TEntity>) {
-    const filterContext =
-      filter instanceof ObjectId ? `ID: ${filter.toString()}` : 'custom filter';
-    this.logger.log(`Deleting documents (${filterContext})`);
+    this.logger.verbose('Action: delete');
 
-    const result = await this._model.deleteMany(normalizeFilter(filter));
-    this.logger.log(`Deleted ${result.deletedCount} documents`);
+    try {
+      await this._model.deleteMany(normalizeFilter(filter));
+      this.logger.log(`Params: ${JSON.stringify(filter)}`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to delete document with filter: ${JSON.stringify(filter)}`,
+        error
+      );
+      throw error;
+    }
   }
 
   public async find(filter?: FilterQuery<TEntity>) {
-    this.logger.verbose(`Finding document with filter`);
-    const doc = await this._model.findOne(normalizeFilter(filter)).lean();
+    this.logger.verbose(`Action: find`);
+    try {
+      const doc = await this._model.findOne(normalizeFilter(filter)).lean();
 
-    if (!doc) {
-      this.logger.verbose('No document found');
-      return null;
+      if (!doc) {
+        this.logger.warn('No document found');
+        return null;
+      }
+
+      const deserializedItem = deserializeItem(doc);
+      this.logger.log(`Params: ${JSON.stringify(filter)}`);
+      return deserializedItem;
+    } catch (error) {
+      this.logger.error(
+        `Failed to delete document with filter: ${JSON.stringify(filter)}`,
+        error
+      );
+      throw error;
     }
-
-    const deserializedItem = deserializeItem(doc);
-    this.logger.verbose(`Found document ID: ${deserializedItem.id.toString()}`);
-    return deserializedItem;
   }
 
   public async list(filter?: FilterQuery<TEntity>) {
@@ -131,23 +160,27 @@ export class MongooseRepository<TEntity extends { id: ObjectId }>
     filter: FilterQuery<Partial<TEntity>> = {},
     options: PaginateOptions<TEntity>
   ): Promise<PaginatedResponse<TEntity>> {
-    this.logger.log(
-      `Paginating list (filter ${JSON.stringify(filter)}, cursor ${
-        options.cursor
-      }, sort ${options.sort}, filter ${filter}, limit ${options.limit})`
-    );
+    this.logger.verbose('Action: paginate');
 
-    const result = await paginate(
-      this._model,
-      normalizeFilter(filter),
-      options
-    );
+    try {
+      const result = await paginate(
+        this._model,
+        normalizeFilter(filter),
+        options
+      );
 
-    this.logger.log(`Paginated result: ${result.data.length}`);
+      this.logger.log(`Params: ${JSON.stringify({ filter, options })}`);
 
-    return {
-      ...result,
-      data: result.data.map(deserializeItem),
-    };
+      return {
+        ...result,
+        data: result.data.map(deserializeItem),
+      };
+    } catch (error) {
+      this.logger.error(
+        `Failed to delete document with filter: ${JSON.stringify(filter)}`,
+        error
+      );
+      throw error;
+    }
   }
 }

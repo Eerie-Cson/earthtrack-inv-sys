@@ -1,7 +1,6 @@
 import { status } from '@grpc/grpc-js';
 import { ObjectId, ObjectType } from '@lib/object-id';
 import { CreateUserRequest } from '@lib/shared';
-import { AccountRole } from '@lib/types';
 import {
   Body,
   Controller,

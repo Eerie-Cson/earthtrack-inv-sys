@@ -19,7 +19,6 @@ export interface UserWithCredentials {
   email: string;
   firstname: string;
   lastname: string;
-  role: string;
   dateTimeCreated: Timestamp | undefined;
   dateTimeLastUpdated: Timestamp | undefined;
 }
@@ -35,6 +34,7 @@ export interface CreateUserRequest {
   email: string;
   firstname: string;
   lastname: string;
+  role: string;
 }
 
 export interface UserResponse {
@@ -67,13 +67,13 @@ export interface ValidateUserResponse_UserData {
 export const USER_PACKAGE_NAME = "user";
 
 export interface UserServiceClient {
-  createUser(request: UserWithCredentials): Observable<BoolResponse>;
+  createUser(request: CreateUserRequest): Observable<BoolResponse>;
 
   validateUser(request: Credentials): Observable<ValidateUserResponse>;
 }
 
 export interface UserServiceController {
-  createUser(request: UserWithCredentials): Promise<BoolResponse> | Observable<BoolResponse> | BoolResponse;
+  createUser(request: CreateUserRequest): Promise<BoolResponse> | Observable<BoolResponse> | BoolResponse;
 
   validateUser(
     request: Credentials,

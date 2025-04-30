@@ -11,8 +11,8 @@ describe('UserController.ValidateUser (gRPC)', () => {
     const user = generateAccount();
     const hashedPassword = await bcrypt.hash(user.password, 10);
 
-    const userRepo = module.get<UserRepository>(Token.UserRepository);
-    await userRepo.create({ ...user, password: hashedPassword });
+    const userRepository = module.get<UserRepository>(Token.UserRepository);
+    await userRepository.create({ ...user, password: hashedPassword });
 
     const response = (await new Promise((resolve, reject) => {
       grpcClient.ValidateUser(
