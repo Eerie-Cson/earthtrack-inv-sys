@@ -36,7 +36,6 @@ export class UserController {
     try {
       await this.userService.createUser({
         id,
-        role: AccountRole.User,
         ...createUserInput,
       });
 
