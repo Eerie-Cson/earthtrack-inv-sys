@@ -1,6 +1,6 @@
 # EarthTrack Inventory System
 
-An enterprise-grade inventory management system built with a monorepo architecture (Nx) and microservices. This project demonstrates a production-quality approach for both the backend (Node.js, TypeScript, NestJS) and the mobile frontend (React Native, TypeScript, Hooks).
+An inventory management system built with a monorepo architecture (Nx) and microservices. This project demonstrates a production-quality approach for both the backend (Node.js, TypeScript, NestJS) and the mobile frontend (React Native, TypeScript, Hooks).
 
 ---
 
