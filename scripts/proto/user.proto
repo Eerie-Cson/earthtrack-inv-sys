@@ -12,8 +12,9 @@ message UserWithCredentials {
   string email = 5;
   string firstname = 6;
   string lastname = 7;
-  google.protobuf.Timestamp dateTimeCreated = 8;
-  google.protobuf.Timestamp dateTimeLastUpdated = 9;
+  string role = 8;
+  google.protobuf.Timestamp dateTimeCreated = 9;
+  google.protobuf.Timestamp dateTimeLastUpdated = 10;
 }
 
 message Credentials {
