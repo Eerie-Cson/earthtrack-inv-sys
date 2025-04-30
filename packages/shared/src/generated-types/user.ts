@@ -19,6 +19,7 @@ export interface UserWithCredentials {
   email: string;
   firstname: string;
   lastname: string;
+  role: string;
   dateTimeCreated: Timestamp | undefined;
   dateTimeLastUpdated: Timestamp | undefined;
 }
