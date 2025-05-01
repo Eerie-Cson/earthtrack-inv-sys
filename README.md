@@ -84,7 +84,7 @@ Key design patterns:
 - **Landing Page**: Displays product categories (tap to view list).
 - **Product Listing**: Shows name, description, price, with pagination.
 - **Settings**: Numeric input (positive, ≤100, required) with validation feedback.
-- **Profile**: Placeholder avatar and user details (hardcoded for demo).
+- **Profile**: Placeholder avatar and user details.
 - Ensure compilable on Android emulator or physical device.
 
 ---
