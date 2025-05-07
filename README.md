@@ -91,7 +91,7 @@ Key design patterns:
 
 ## Tech Stack
 
-- **Backend**: Node.js, TypeScript, NestJS, MongoDB (or SQL), Docker, Jest, RxJS.
+- **Backend**: Node.js, TypeScript, NestJS, MongoDB, Docker, Jest, RxJS.
 - **Frontend**: React Native, TypeScript, React Navigation, Axios.
 - **Monorepo**: Nx, ESLint, Prettier.
 - **ID Utility**: Custom `ObjectId` class with hex & Base58 support.
